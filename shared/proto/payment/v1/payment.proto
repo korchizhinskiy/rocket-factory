@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package payment.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1;paymentv1";
+
+service PaymentService {
+  rpc PayOrder(PayOrderRequest) returns (PayOrderResponse);
+}
+
+// Payment Method Enumeration
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  PAYMENT_METHOD_CARD = 1;
+  PAYMENT_METHOD_SBP = 2;
+  PAYMENT_METHOD_CREDIT_CARD = 3;
+  PAYMENT_METHOD_INVESTOR_MONEY = 4;
+}
+
+// Request Structure for PayOrder action
+message PayOrderRequest {
+  string order_uuid = 1 [(buf.validate.field).string.uuid = true];
+  string user_uuid = 2 [(buf.validate.field).string.uuid = true];
+  PaymentMethod payment_method = 3 [(buf.validate.field).required = true];;
+}
+
+// Response Structure for PayOrder action
+message PayOrderResponse {
+  string transaction_uuid = 1;
+}

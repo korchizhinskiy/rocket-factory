@@ -1,0 +1,9 @@
+version: v2
+
+modules:
+  - path: shared/proto
+  - path: shared/vendor/protovalidate/proto/protovalidate
+ 
+lint:
+  ignore:
+    - shared/vendor/protovalidate/proto/protovalidate

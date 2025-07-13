@@ -1,0 +1,11 @@
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/bufbuild/protovalidate/tools/internal/gen
+plugins:
+  - remote: buf.build/protocolbuffers/go:v1.36.6
+    out: tools/internal/gen
+    opt: paths=source_relative

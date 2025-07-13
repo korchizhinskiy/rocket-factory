@@ -1,0 +1,3 @@
+[submodule "shared/vendor/protovalidate"]
+	path = shared/vendor/protovalidate
+	url = https://github.com/bufbuild/protovalidate.git
