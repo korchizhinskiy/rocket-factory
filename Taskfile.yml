@@ -162,14 +162,12 @@ tasks:
   proto:gen:
     deps: [ install-buf, proto:install-plugins, proto:lint ]
     desc: Генерация Go-кода из .proto
-    dir: shared/proto
     cmds:
       - '{{.BUF}} generate'
 
   proto:lint:
     deps: [ install-buf, proto:install-plugins ]
     desc: Проверка .proto-файлов на соответствие стилю
-    dir: shared/proto
     cmds:
       - '{{.BUF}} lint'
       

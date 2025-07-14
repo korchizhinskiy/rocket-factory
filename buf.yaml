@@ -2,8 +2,16 @@ version: v2
 
 modules:
   - path: shared/proto
+    lint:
+      use:
+        - STANDARD
+        - COMMENT_ENUM
+        - COMMENT_MESSAGE
+      except:
+        - RPC_RESPONSE_STANDARD_NAME
+        - RPC_REQUEST_RESPONSE_UNIQUE
+
   - path: shared/vendor/protovalidate/proto/protovalidate
- 
-lint:
-  ignore:
-    - shared/vendor/protovalidate/proto/protovalidate
+    lint:
+      ignore:
+        - shared/vendor/protovalidate/proto/protovalidate
