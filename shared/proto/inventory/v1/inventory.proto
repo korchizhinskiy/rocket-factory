@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package inventory.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1;inventoryv1";
+
+service InventoryService {
+  rpc ListPart(ListPartRequest) returns (ListPartResponse);
+  // rpc GetPart(GetPartRequest) returns (GetPartResponse);
+}
+
+// --- STRUCTURES --- //
+
+// Part Structure
+message Part {
+  string uuid = 1 [ (buf.validate.field).string.uuid = true ];
+  string name = 2 [ (buf.validate.field).required = true ];
+  string description = 3 [ (buf.validate.field).required = true ];
+  double price = 4 [ (buf.validate.field).required = true ];
+  int64 stock_quantity = 5 [ (buf.validate.field).required = true ];
+  PartCategory category = 6 [ (buf.validate.field).required = true ];
+  Dimensions dimensions = 7 [ (buf.validate.field).required = true ];
+  Manufacturer manufacturer = 8 [ (buf.validate.field).required = true ];
+  repeated string tags = 9;
+  map<string, MetadataValue> metadata = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// Category Enumeration
+enum PartCategory {
+  PART_CATEGORY_UNSPECIFIED = 0;
+  PART_CATEGORY_ENGINE = 1;
+  PART_CATEGORY_FUEL = 2;
+  PART_CATEGORY_PORTHOLE = 3;
+  PART_CATEGORY_WING = 4;
+}
+
+// Dimension Structure
+message Dimensions {
+  double length = 1 [ (buf.validate.field).required = true ];
+  double width = 2 [ (buf.validate.field).required = true ];
+  double height = 3 [ (buf.validate.field).required = true ];
+  double weight = 4 [ (buf.validate.field).required = true ];
+}
+
+// Dimension Structure
+message Manufacturer {
+  string name = 1 [ (buf.validate.field).required = true ];
+  string country = 2 [ (buf.validate.field).required = true ];
+  string website = 3 [ (buf.validate.field).required = true ];
+}
+
+// Metadata Value Structure
+message MetadataValue {
+  oneof type {
+    string string_value = 1;
+    string int64_value = 2;
+    string double_value = 3;
+    string bool_value = 4;
+  }
+}
+
+// Filters for List of Parts
+message PartsFilter {
+  repeated string uuids = 1 [ (buf.validate.field).repeated.items = {
+    string : {uuid : true},
+  } ];
+  repeated string names = 2;
+  repeated PartCategory categories = 3;
+  repeated string manufactorer_countries = 4;
+  repeated string tags = 5;
+}
+// --- REQUESTS --- //
+
+// Request data for get List of Parts
+message ListPartRequest { PartsFilter filter = 1; }
+
+// --- RESPONSES --- //
+
+// Response data with List of Parts
+message ListPartResponse { repeated Part parts = 1; }
