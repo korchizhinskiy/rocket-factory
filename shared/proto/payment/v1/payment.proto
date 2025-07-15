@@ -23,7 +23,7 @@ enum PaymentMethod {
 message PayOrderRequest {
   string order_uuid = 1 [(buf.validate.field).string.uuid = true];
   string user_uuid = 2 [(buf.validate.field).string.uuid = true];
-  PaymentMethod payment_method = 3 [(buf.validate.field).required = true];;
+  PaymentMethod payment_method = 3 [(buf.validate.field).required = true];
 }
 
 // Response Structure for PayOrder action
