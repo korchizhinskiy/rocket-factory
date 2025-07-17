@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"os"
@@ -14,67 +13,87 @@ import (
 	"buf.build/go/protovalidate"
 	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
-	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
 const grpcPort = 50052
 
 type inventoryService struct {
-	inventoryv1.InventoryServiceServer
+	inventoryv1.UnimplementedInventoryServiceServer
 
-	mu sync.RWMutex
+	parts map[string]*inventoryv1.Part
+	mu    sync.RWMutex
 }
 
-func (s *inventoryService) ListPart(_ context.Context, request *inventoryv1.ListPartRequest) (*inventoryv1.ListPartResponse, error) {
-	parts := []*inventoryv1.Part{
-		{
-			Uuid:          "da8bf2b2-7278-4ff8-bc99-864315109354",
-			Name:          "Hello",
-			Price:         100,
-			StockQuantity: 100,
-			Category:      inventoryv1.PartCategory_PART_CATEGORY_ENGINE,
-			Tags:          []string{},
-		},
+func (inv *inventoryService) ListPart(
+	_ context.Context,
+	request *inventoryv1.ListPartRequest,
+) (*inventoryv1.ListPartResponse, error) {
+	inv.mu.Lock()
+	defer inv.mu.Unlock()
+	uuidFilter := partUUIDFilter{}
+	tagFilter := partTagFilter{}
+
+	partsMap := uuidFilter.filter(inv.parts, request.GetFilter().Uuids)
+	partsMap = tagFilter.filter(partsMap, request.GetFilter().Tags)
+
+	partSlice := make([]*inventoryv1.Part, len(partsMap))
+
+	idx := 0
+	for _, v := range partsMap {
+		partSlice[idx] = v
+		idx++
 	}
-	log.Print(parts[0].Uuid)
-	return &inventoryv1.ListPartResponse{Parts: parts}, nil
+
+	return &inventoryv1.ListPartResponse{Parts: partSlice}, nil
 }
 
 func main() {
 	logger := GetLogger()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		logger.Info("Failed to listen: %v\n", err)
+		logger.Info("Failed to listen", slog.Any("error", err))
 		return
 	}
 
 	defer func() {
 		if err := lis.Close(); err != nil {
-			logger.Info("Failed to close listener: %v\n", err)
+			logger.Info("Failed to close listener", slog.Any("error", err))
 		}
 	}()
-	validator, _ := protovalidate.New()
+
+	validator, err := protovalidate.New()
+	if err != nil {
+		logger.Info("Failed to create Validators", slog.Any("error", err))
+		return
+	}
+
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			protovalidate_middleware.UnaryServerInterceptor(validator),
-			logging_middleware.UnaryServerInterceptor(InterceptorLogger(logger), []logging_middleware.Option{
-				logging_middleware.WithLogOnEvents(logging_middleware.StartCall, logging_middleware.FinishCall),
-			}...),
+			logging_middleware.UnaryServerInterceptor(
+				InterceptorLogger(logger),
+				[]logging_middleware.Option{
+					logging_middleware.WithLogOnEvents(
+						logging_middleware.StartCall,
+						logging_middleware.FinishCall,
+					),
+				}...),
 		),
 	)
 
 	reflection.Register(server)
-	service := &inventoryService{}
-
+	service := &inventoryService{parts: generateParts()}
 	inventoryv1.RegisterInventoryServiceServer(server, service)
 
 	go func() {
-		log.Printf("gRPC server listening on %d\n", grpcPort)
+		logger.Info("gRPC server listening", slog.Any("port", grpcPort))
 		err := server.Serve(lis)
 		if err != nil {
-			log.Printf("Failed to serve: %v\n", err)
+			logger.Info("Failed to serve", slog.Any("error", err))
 			return
 		}
 	}()
@@ -83,11 +102,11 @@ func main() {
 
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutting down gRPC server...")
+	logger.Info("Shutting down gRPC server...")
 	server.GracefulStop()
-	log.Println("Server stopped")
-
+	logger.Info("Server stopped")
 }
+
 func GetLogger() *slog.Logger {
 	return slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -95,7 +114,9 @@ func GetLogger() *slog.Logger {
 }
 
 func InterceptorLogger(l *slog.Logger) logging_middleware.Logger {
-	return logging_middleware.LoggerFunc(func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
-		l.Log(ctx, slog.Level(lvl), msg, fields...)
-	})
+	return logging_middleware.LoggerFunc(
+		func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
+			l.Log(ctx, slog.Level(lvl), msg, fields...)
+		},
+	)
 }

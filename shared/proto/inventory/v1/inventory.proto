@@ -58,9 +58,9 @@ message Manufacturer {
 message MetadataValue {
   oneof type {
     string string_value = 1;
-    string int64_value = 2;
-    string double_value = 3;
-    string bool_value = 4;
+    int64 int64_value = 2;
+    double double_value = 3;
+    bool bool_value = 4;
   }
 }
 
@@ -82,4 +82,6 @@ message ListPartRequest { PartsFilter filter = 1; }
 // --- RESPONSES --- //
 
 // Response data with List of Parts
-message ListPartResponse { repeated Part parts = 1; }
+message ListPartResponse { 
+  repeated Part parts = 1; 
+}

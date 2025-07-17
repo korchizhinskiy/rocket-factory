@@ -2,7 +2,7 @@ module github.com/korchizhinskiy/rocket-factory/payment
 
 replace github.com/korchizhinskiy/rocket-factory/shared => ../shared
 
-go 1.24.4
+go 1.24.5
 
 require (
 	buf.build/go/protovalidate v0.13.1

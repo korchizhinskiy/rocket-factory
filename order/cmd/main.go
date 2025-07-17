@@ -15,9 +15,10 @@ import (
 	"github.com/google/uuid"
 	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
-	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 const grpcPort = 50052
@@ -76,8 +77,8 @@ func main() {
 	log.Println("Shutting down gRPC server...")
 	server.GracefulStop()
 	log.Println("Server stopped")
-
 }
+
 func GetLogger() *slog.Logger {
 	return slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelDebug,

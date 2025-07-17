@@ -15,9 +15,10 @@ import (
 	"github.com/google/uuid"
 	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
-	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 const grpcPort = 50051
@@ -28,7 +29,10 @@ type paymentService struct {
 	mu sync.RWMutex
 }
 
-func (s *paymentService) PayOrder(_ context.Context, request *paymentv1.PayOrderRequest) (*paymentv1.PayOrderResponse, error) {
+func (s *paymentService) PayOrder(
+	_ context.Context,
+	request *paymentv1.PayOrderRequest,
+) (*paymentv1.PayOrderResponse, error) {
 	return &paymentv1.PayOrderResponse{TransactionUuid: uuid.NewString()}, nil
 }
 
@@ -36,22 +40,27 @@ func main() {
 	logger := GetLogger()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		logger.Info("Failed to listen: %v\n", err)
+		logger.Info("Failed to listen", slog.Any("error", err))
 		return
 	}
 
 	defer func() {
 		if err := lis.Close(); err != nil {
-			logger.Info("Failed to close listener: %v\n", err)
+			logger.Info("Failed to close listener", slog.Any("error", err))
 		}
 	}()
 	validator, _ := protovalidate.New()
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			protovalidate_middleware.UnaryServerInterceptor(validator),
-			logging_middleware.UnaryServerInterceptor(InterceptorLogger(logger), []logging_middleware.Option{
-				logging_middleware.WithLogOnEvents(logging_middleware.StartCall, logging_middleware.FinishCall),
-			}...),
+			logging_middleware.UnaryServerInterceptor(
+				InterceptorLogger(logger),
+				[]logging_middleware.Option{
+					logging_middleware.WithLogOnEvents(
+						logging_middleware.StartCall,
+						logging_middleware.FinishCall,
+					),
+				}...),
 		),
 	)
 
@@ -76,8 +85,8 @@ func main() {
 	log.Println("Shutting down gRPC server...")
 	server.GracefulStop()
 	log.Println("Server stopped")
-
 }
+
 func GetLogger() *slog.Logger {
 	return slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -85,7 +94,9 @@ func GetLogger() *slog.Logger {
 }
 
 func InterceptorLogger(l *slog.Logger) logging_middleware.Logger {
-	return logging_middleware.LoggerFunc(func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
-		l.Log(ctx, slog.Level(lvl), msg, fields...)
-	})
+	return logging_middleware.LoggerFunc(
+		func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
+			l.Log(ctx, slog.Level(lvl), msg, fields...)
+		},
+	)
 }

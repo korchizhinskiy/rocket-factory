@@ -7,13 +7,14 @@
 package inventoryv1
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -402,31 +403,31 @@ func (x *MetadataValue) GetStringValue() string {
 	return ""
 }
 
-func (x *MetadataValue) GetInt64Value() string {
+func (x *MetadataValue) GetInt64Value() int64 {
 	if x != nil {
 		if x, ok := x.Type.(*MetadataValue_Int64Value); ok {
 			return x.Int64Value
 		}
 	}
-	return ""
+	return 0
 }
 
-func (x *MetadataValue) GetDoubleValue() string {
+func (x *MetadataValue) GetDoubleValue() float64 {
 	if x != nil {
 		if x, ok := x.Type.(*MetadataValue_DoubleValue); ok {
 			return x.DoubleValue
 		}
 	}
-	return ""
+	return 0
 }
 
-func (x *MetadataValue) GetBoolValue() string {
+func (x *MetadataValue) GetBoolValue() bool {
 	if x != nil {
 		if x, ok := x.Type.(*MetadataValue_BoolValue); ok {
 			return x.BoolValue
 		}
 	}
-	return ""
+	return false
 }
 
 type isMetadataValue_Type interface {
@@ -438,15 +439,15 @@ type MetadataValue_StringValue struct {
 }
 
 type MetadataValue_Int64Value struct {
-	Int64Value string `protobuf:"bytes,2,opt,name=int64_value,json=int64Value,proto3,oneof"`
+	Int64Value int64 `protobuf:"varint,2,opt,name=int64_value,json=int64Value,proto3,oneof"`
 }
 
 type MetadataValue_DoubleValue struct {
-	DoubleValue string `protobuf:"bytes,3,opt,name=double_value,json=doubleValue,proto3,oneof"`
+	DoubleValue float64 `protobuf:"fixed64,3,opt,name=double_value,json=doubleValue,proto3,oneof"`
 }
 
 type MetadataValue_BoolValue struct {
-	BoolValue string `protobuf:"bytes,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
+	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
 }
 
 func (*MetadataValue_StringValue) isMetadataValue_Type() {}
@@ -662,11 +663,11 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\awebsite\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\awebsite\"\xa5\x01\n" +
 	"\rMetadataValue\x12#\n" +
 	"\fstring_value\x18\x01 \x01(\tH\x00R\vstringValue\x12!\n" +
-	"\vint64_value\x18\x02 \x01(\tH\x00R\n" +
+	"\vint64_value\x18\x02 \x01(\x03H\x00R\n" +
 	"int64Value\x12#\n" +
-	"\fdouble_value\x18\x03 \x01(\tH\x00R\vdoubleValue\x12\x1f\n" +
+	"\fdouble_value\x18\x03 \x01(\x01H\x00R\vdoubleValue\x12\x1f\n" +
 	"\n" +
-	"bool_value\x18\x04 \x01(\tH\x00R\tboolValueB\x06\n" +
+	"bool_value\x18\x04 \x01(\bH\x00R\tboolValueB\x06\n" +
 	"\x04type\"\xcf\x01\n" +
 	"\vPartsFilter\x12#\n" +
 	"\x05uuids\x18\x01 \x03(\tB\r\xbaH\n" +
@@ -703,20 +704,23 @@ func file_inventory_v1_inventory_proto_rawDescGZIP() []byte {
 	return file_inventory_v1_inventory_proto_rawDescData
 }
 
-var file_inventory_v1_inventory_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_inventory_v1_inventory_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_inventory_v1_inventory_proto_goTypes = []any{
-	(PartCategory)(0),             // 0: inventory.v1.PartCategory
-	(*Part)(nil),                  // 1: inventory.v1.Part
-	(*Dimensions)(nil),            // 2: inventory.v1.Dimensions
-	(*Manufacturer)(nil),          // 3: inventory.v1.Manufacturer
-	(*MetadataValue)(nil),         // 4: inventory.v1.MetadataValue
-	(*PartsFilter)(nil),           // 5: inventory.v1.PartsFilter
-	(*ListPartRequest)(nil),       // 6: inventory.v1.ListPartRequest
-	(*ListPartResponse)(nil),      // 7: inventory.v1.ListPartResponse
-	nil,                           // 8: inventory.v1.Part.MetadataEntry
-	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
-}
+var (
+	file_inventory_v1_inventory_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+	file_inventory_v1_inventory_proto_msgTypes  = make([]protoimpl.MessageInfo, 8)
+	file_inventory_v1_inventory_proto_goTypes   = []any{
+		(PartCategory)(0),             // 0: inventory.v1.PartCategory
+		(*Part)(nil),                  // 1: inventory.v1.Part
+		(*Dimensions)(nil),            // 2: inventory.v1.Dimensions
+		(*Manufacturer)(nil),          // 3: inventory.v1.Manufacturer
+		(*MetadataValue)(nil),         // 4: inventory.v1.MetadataValue
+		(*PartsFilter)(nil),           // 5: inventory.v1.PartsFilter
+		(*ListPartRequest)(nil),       // 6: inventory.v1.ListPartRequest
+		(*ListPartResponse)(nil),      // 7: inventory.v1.ListPartResponse
+		nil,                           // 8: inventory.v1.Part.MetadataEntry
+		(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
+	}
+)
+
 var file_inventory_v1_inventory_proto_depIdxs = []int32{
 	0,  // 0: inventory.v1.Part.category:type_name -> inventory.v1.PartCategory
 	2,  // 1: inventory.v1.Part.dimensions:type_name -> inventory.v1.Dimensions
