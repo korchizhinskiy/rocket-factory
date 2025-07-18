@@ -36,9 +36,15 @@ func (inv *inventoryService) ListPart(
 	defer inv.mu.Unlock()
 	uuidFilter := partUUIDFilter{}
 	tagFilter := partTagFilter{}
+	nameFilter := partNameFilter{}
+	categoryFilter := partCategoryFilter{}
+	manufacturerCountriesFilter := partManufacturerCountriesFilter{}
 
 	partsMap := uuidFilter.filter(inv.parts, request.GetFilter().Uuids)
 	partsMap = tagFilter.filter(partsMap, request.GetFilter().Tags)
+	partsMap = nameFilter.filter(partsMap, request.GetFilter().Names)
+	partsMap = categoryFilter.filter(partsMap, request.GetFilter().Categories)
+	partsMap = manufacturerCountriesFilter.filter(partsMap, request.GetFilter().ManufactorerCountries)
 
 	partSlice := make([]*inventoryv1.Part, len(partsMap))
 
