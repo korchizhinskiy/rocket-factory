@@ -2,91 +2,87 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
-	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
+	"time"
 
-	"buf.build/go/protovalidate"
-	"github.com/google/uuid"
-	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-
-	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-const grpcPort = 50052
+const (
+	httpPort = "8080"
+	// Таймауты для HTTP-сервера
+	readHeaderTimeout = 5 * time.Second
+	shutdownTimeout   = 10 * time.Second
+)
 
-type paymentService struct {
-	paymentv1.UnimplementedPaymentServiceServer
+type WeatherHandler struct { }
 
-	mu sync.RWMutex
+func NewWeatherHandler() *WeatherHandler {
+	return &WeatherHandler{}
 }
 
-func (s *paymentService) PayOrder(_ context.Context, request *paymentv1.PayOrderRequest) (*paymentv1.PayOrderResponse, error) {
-	return &paymentv1.PayOrderResponse{TransactionUuid: uuid.NewString()}, nil
-}
+// func (h *WeatherHandler) NewError(_ context.Context, err error) *weatherV1.GenericErrorStatusCode {
+// 	return &weatherV1.GenericErrorStatusCode{
+// 		StatusCode: http.StatusInternalServerError,
+// 		Response: weatherV1.GenericError{
+// 			Code:    weatherV1.NewOptInt(http.StatusInternalServerError),
+// 			Message: weatherV1.NewOptString(err.Error()),
+// 		},
+// 	}
+// }
 
 func main() {
-	logger := GetLogger()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
-	if err != nil {
-		logger.Info("Failed to listen: %v\n", err)
-		return
+	weatherHandler := NewWeatherHandler()
+
+	// weatherServer, err := weatherV1.NewServer(weatherHandler)
+	// if err != nil {
+	// 	log.Fatalf("ошибка создания сервера OpenAPI: %v", err)
+	// }
+
+	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(10 * time.Second))
+	// r.Use(customMiddleware.RequestLogger)
+
+	// r.Mount("/", weatherServer)
+
+	// Запускаем HTTP-сервер
+	server := &http.Server{
+		Addr:              net.JoinHostPort("localhost", httpPort),
+		Handler:           r,
+		ReadHeaderTimeout: readHeaderTimeout,
 	}
 
-	defer func() {
-		if err := lis.Close(); err != nil {
-			logger.Info("Failed to close listener: %v\n", err)
-		}
-	}()
-	validator, _ := protovalidate.New()
-	server := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
-			protovalidate_middleware.UnaryServerInterceptor(validator),
-			logging_middleware.UnaryServerInterceptor(InterceptorLogger(logger), []logging_middleware.Option{
-				logging_middleware.WithLogOnEvents(logging_middleware.StartCall, logging_middleware.FinishCall),
-			}...),
-		),
-	)
-
-	reflection.Register(server)
-	service := &paymentService{}
-
-	paymentv1.RegisterPaymentServiceServer(server, service)
-
 	go func() {
-		log.Printf("gRPC server listening on %d\n", grpcPort)
-		err := server.Serve(lis)
-		if err != nil {
-			log.Printf("Failed to serve: %v\n", err)
-			return
+		log.Printf("🚀 HTTP-сервер запущен на порту %s\n", httpPort)
+		err := server.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("❌ Ошибка запуска сервера: %v\n", err)
 		}
 	}()
 
 	quit := make(chan os.Signal, 1)
-
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutting down gRPC server...")
-	server.GracefulStop()
-	log.Println("Server stopped")
-}
 
-func GetLogger() *slog.Logger {
-	return slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	}))
-}
+	log.Println("🛑 Завершение работы сервера...")
 
-func InterceptorLogger(l *slog.Logger) logging_middleware.Logger {
-	return logging_middleware.LoggerFunc(func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
-		l.Log(ctx, slog.Level(lvl), msg, fields...)
-	})
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+
+	err := server.Shutdown(ctx)
+	if err != nil {
+		log.Printf("❌ Ошибка при остановке сервера: %v\n", err)
+	}
+
+	log.Println("✅ Сервер остановлен")
 }

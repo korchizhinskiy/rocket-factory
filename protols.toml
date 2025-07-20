@@ -1,5 +1,5 @@
 [config]
-include_paths = ["shared/proto", "shared/vendor/protovalidate/proto/protovalidate"]
+include_paths = ["shared/proto"]
 
 [config.path]
 clang_format = "clang-format"

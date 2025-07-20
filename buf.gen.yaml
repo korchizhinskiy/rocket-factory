@@ -17,3 +17,5 @@ managed:
   disable:
     - file_option: go_package
       module: github.com/bufbuild/protovalidate-go
+    - file_option: go_package
+      module: github.com/googleapis/googleapis

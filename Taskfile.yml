@@ -145,7 +145,15 @@ tasks:
           rm -rf tmp-buf
           chmod +x {{.BUF}}
         }
-
+        
+  proto:update-deps:
+    deps: [ install-buf ]
+    desc: Обновляет зависимости protobuf из удаленных репозиториев (googleapis и т.д.)
+    cmds:
+      - |
+        echo "🔄 Обновляем зависимости buf..."
+        {{.BUF}} dep update
+        
   proto:install-plugins:
     desc: "Устанавливает protoc плагины в каталог bin"
     cmds:
@@ -170,7 +178,32 @@ tasks:
     desc: Проверка .proto-файлов на соответствие стилю
     cmds:
       - "{{.BUF}} lint"
+      
+  yq:install:
+    desc: "Устанавливает yq в bin/ при необходимости"
+    cmds:
+      - |
+        [ -f {{.YQ}} ] || {
+          echo '📦 Installing yq...'
+          GOBIN={{.BIN_DIR}} go install github.com/mikefarah/yq/v4@{{.YQ_VERSION}}
+        }
+  ogen:install:
+    desc: "Скачивает ogen в папку bin"
+    cmds:
+      - |
+        [ -f {{.OGEN}} ] || {
+          mkdir -p {{.BIN_DIR}}
+          GOBIN={{.BIN_DIR}} go install github.com/ogen-go/ogen/cmd/ogen@{{.OGEN_VERSION}}
+        }
 
+  ogen:gen:
+    desc: "Генерация Go-кода из всех OpenAPI-деклараций с x-ogen"
+    deps: [ ogen:install, yq:install]
+    cmds:
+      - |
+        TARGET=$({{.YQ}} '.x-ogen.target' {{.OPEN_API_ORDER_V1_BASE}})
+        PACKAGE=$({{.YQ}} '.x-ogen.package' {{.OPEN_API_ORDER_V1_BASE}})
+        {{.OGEN}} --target "$TARGET" --package "$PACKAGE" --clean {{.OPEN_API_ORDER_V1_BASE}} || exit 1
   deps:update:
     desc: "Обновление зависимостей в go.mod во всех модулях"
     cmds:
