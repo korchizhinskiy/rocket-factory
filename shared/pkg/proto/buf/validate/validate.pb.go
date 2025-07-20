@@ -21,15 +21,14 @@
 package validate
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -8537,52 +8536,49 @@ func file_buf_validate_validate_proto_rawDescGZIP() []byte {
 	return file_buf_validate_validate_proto_rawDescData
 }
 
-var (
-	file_buf_validate_validate_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-	file_buf_validate_validate_proto_msgTypes  = make([]protoimpl.MessageInfo, 31)
-	file_buf_validate_validate_proto_goTypes   = []any{
-		(Ignore)(0),                                 // 0: buf.validate.Ignore
-		(KnownRegex)(0),                             // 1: buf.validate.KnownRegex
-		(*Rule)(nil),                                // 2: buf.validate.Rule
-		(*MessageRules)(nil),                        // 3: buf.validate.MessageRules
-		(*MessageOneofRule)(nil),                    // 4: buf.validate.MessageOneofRule
-		(*OneofRules)(nil),                          // 5: buf.validate.OneofRules
-		(*FieldRules)(nil),                          // 6: buf.validate.FieldRules
-		(*PredefinedRules)(nil),                     // 7: buf.validate.PredefinedRules
-		(*FloatRules)(nil),                          // 8: buf.validate.FloatRules
-		(*DoubleRules)(nil),                         // 9: buf.validate.DoubleRules
-		(*Int32Rules)(nil),                          // 10: buf.validate.Int32Rules
-		(*Int64Rules)(nil),                          // 11: buf.validate.Int64Rules
-		(*UInt32Rules)(nil),                         // 12: buf.validate.UInt32Rules
-		(*UInt64Rules)(nil),                         // 13: buf.validate.UInt64Rules
-		(*SInt32Rules)(nil),                         // 14: buf.validate.SInt32Rules
-		(*SInt64Rules)(nil),                         // 15: buf.validate.SInt64Rules
-		(*Fixed32Rules)(nil),                        // 16: buf.validate.Fixed32Rules
-		(*Fixed64Rules)(nil),                        // 17: buf.validate.Fixed64Rules
-		(*SFixed32Rules)(nil),                       // 18: buf.validate.SFixed32Rules
-		(*SFixed64Rules)(nil),                       // 19: buf.validate.SFixed64Rules
-		(*BoolRules)(nil),                           // 20: buf.validate.BoolRules
-		(*StringRules)(nil),                         // 21: buf.validate.StringRules
-		(*BytesRules)(nil),                          // 22: buf.validate.BytesRules
-		(*EnumRules)(nil),                           // 23: buf.validate.EnumRules
-		(*RepeatedRules)(nil),                       // 24: buf.validate.RepeatedRules
-		(*MapRules)(nil),                            // 25: buf.validate.MapRules
-		(*AnyRules)(nil),                            // 26: buf.validate.AnyRules
-		(*DurationRules)(nil),                       // 27: buf.validate.DurationRules
-		(*TimestampRules)(nil),                      // 28: buf.validate.TimestampRules
-		(*Violations)(nil),                          // 29: buf.validate.Violations
-		(*Violation)(nil),                           // 30: buf.validate.Violation
-		(*FieldPath)(nil),                           // 31: buf.validate.FieldPath
-		(*FieldPathElement)(nil),                    // 32: buf.validate.FieldPathElement
-		(*durationpb.Duration)(nil),                 // 33: google.protobuf.Duration
-		(*timestamppb.Timestamp)(nil),               // 34: google.protobuf.Timestamp
-		(descriptorpb.FieldDescriptorProto_Type)(0), // 35: google.protobuf.FieldDescriptorProto.Type
-		(*descriptorpb.MessageOptions)(nil),         // 36: google.protobuf.MessageOptions
-		(*descriptorpb.OneofOptions)(nil),           // 37: google.protobuf.OneofOptions
-		(*descriptorpb.FieldOptions)(nil),           // 38: google.protobuf.FieldOptions
-	}
-)
-
+var file_buf_validate_validate_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_buf_validate_validate_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_buf_validate_validate_proto_goTypes = []any{
+	(Ignore)(0),                                 // 0: buf.validate.Ignore
+	(KnownRegex)(0),                             // 1: buf.validate.KnownRegex
+	(*Rule)(nil),                                // 2: buf.validate.Rule
+	(*MessageRules)(nil),                        // 3: buf.validate.MessageRules
+	(*MessageOneofRule)(nil),                    // 4: buf.validate.MessageOneofRule
+	(*OneofRules)(nil),                          // 5: buf.validate.OneofRules
+	(*FieldRules)(nil),                          // 6: buf.validate.FieldRules
+	(*PredefinedRules)(nil),                     // 7: buf.validate.PredefinedRules
+	(*FloatRules)(nil),                          // 8: buf.validate.FloatRules
+	(*DoubleRules)(nil),                         // 9: buf.validate.DoubleRules
+	(*Int32Rules)(nil),                          // 10: buf.validate.Int32Rules
+	(*Int64Rules)(nil),                          // 11: buf.validate.Int64Rules
+	(*UInt32Rules)(nil),                         // 12: buf.validate.UInt32Rules
+	(*UInt64Rules)(nil),                         // 13: buf.validate.UInt64Rules
+	(*SInt32Rules)(nil),                         // 14: buf.validate.SInt32Rules
+	(*SInt64Rules)(nil),                         // 15: buf.validate.SInt64Rules
+	(*Fixed32Rules)(nil),                        // 16: buf.validate.Fixed32Rules
+	(*Fixed64Rules)(nil),                        // 17: buf.validate.Fixed64Rules
+	(*SFixed32Rules)(nil),                       // 18: buf.validate.SFixed32Rules
+	(*SFixed64Rules)(nil),                       // 19: buf.validate.SFixed64Rules
+	(*BoolRules)(nil),                           // 20: buf.validate.BoolRules
+	(*StringRules)(nil),                         // 21: buf.validate.StringRules
+	(*BytesRules)(nil),                          // 22: buf.validate.BytesRules
+	(*EnumRules)(nil),                           // 23: buf.validate.EnumRules
+	(*RepeatedRules)(nil),                       // 24: buf.validate.RepeatedRules
+	(*MapRules)(nil),                            // 25: buf.validate.MapRules
+	(*AnyRules)(nil),                            // 26: buf.validate.AnyRules
+	(*DurationRules)(nil),                       // 27: buf.validate.DurationRules
+	(*TimestampRules)(nil),                      // 28: buf.validate.TimestampRules
+	(*Violations)(nil),                          // 29: buf.validate.Violations
+	(*Violation)(nil),                           // 30: buf.validate.Violation
+	(*FieldPath)(nil),                           // 31: buf.validate.FieldPath
+	(*FieldPathElement)(nil),                    // 32: buf.validate.FieldPathElement
+	(*durationpb.Duration)(nil),                 // 33: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),               // 34: google.protobuf.Timestamp
+	(descriptorpb.FieldDescriptorProto_Type)(0), // 35: google.protobuf.FieldDescriptorProto.Type
+	(*descriptorpb.MessageOptions)(nil),         // 36: google.protobuf.MessageOptions
+	(*descriptorpb.OneofOptions)(nil),           // 37: google.protobuf.OneofOptions
+	(*descriptorpb.FieldOptions)(nil),           // 38: google.protobuf.FieldOptions
+}
 var file_buf_validate_validate_proto_depIdxs = []int32{
 	2,  // 0: buf.validate.MessageRules.cel:type_name -> buf.validate.Rule
 	4,  // 1: buf.validate.MessageRules.oneof:type_name -> buf.validate.MessageOneofRule

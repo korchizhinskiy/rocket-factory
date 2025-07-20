@@ -9,7 +9,7 @@ option go_package = "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/i
 
 service InventoryService {
   rpc ListPart(ListPartRequest) returns (ListPartResponse);
-  // rpc GetPart(GetPartRequest) returns (GetPartResponse);
+  rpc GetPart(GetPartRequest) returns (GetPartResponse);
 }
 
 // --- STRUCTURES --- //
@@ -79,9 +79,15 @@ message PartsFilter {
 // Request data for get List of Parts
 message ListPartRequest { PartsFilter filter = 1; }
 
+// Request data for get Part by UUID
+message GetPartRequest {
+  string uuid = 1 [ (buf.validate.field).string.uuid = true ];
+}
+
 // --- RESPONSES --- //
 
 // Response data with List of Parts
-message ListPartResponse { 
-  repeated Part parts = 1; 
-}
+message ListPartResponse { repeated Part parts = 1; }
+
+// Response data with Part by UUID
+message GetPartResponse { Part part = 1; }
