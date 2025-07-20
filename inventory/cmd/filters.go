@@ -5,8 +5,6 @@ import (
 
 	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
 )
-type partFilter struct {
-	nameFilter partNameFilter}
 
 type partUUIDFilter struct{}
 

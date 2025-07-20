@@ -14,7 +14,9 @@ import (
 	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 
 	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
 )
@@ -28,27 +30,46 @@ type inventoryService struct {
 	mu    sync.RWMutex
 }
 
+func (inv *inventoryService) GetPart(
+	_ context.Context,
+	request *inventoryv1.GetPartRequest,
+) (*inventoryv1.GetPartResponse, error) {
+	part, ok := inv.parts[request.Uuid]
+
+	if !ok {
+		return nil, status.Error(codes.NotFound, "part not found")
+	}
+	return &inventoryv1.GetPartResponse{Part: part}, nil
+}
+
 func (inv *inventoryService) ListPart(
 	_ context.Context,
 	request *inventoryv1.ListPartRequest,
 ) (*inventoryv1.ListPartResponse, error) {
 	inv.mu.Lock()
 	defer inv.mu.Unlock()
+
 	uuidFilter := partUUIDFilter{}
 	tagFilter := partTagFilter{}
 	nameFilter := partNameFilter{}
 	categoryFilter := partCategoryFilter{}
 	manufacturerCountriesFilter := partManufacturerCountriesFilter{}
 
-	partsMap := uuidFilter.filter(inv.parts, request.GetFilter().Uuids)
-	partsMap = tagFilter.filter(partsMap, request.GetFilter().Tags)
-	partsMap = nameFilter.filter(partsMap, request.GetFilter().Names)
-	partsMap = categoryFilter.filter(partsMap, request.GetFilter().Categories)
-	partsMap = manufacturerCountriesFilter.filter(partsMap, request.GetFilter().ManufactorerCountries)
+	var partSlice []*inventoryv1.Part
+	partsMap := inv.parts
 
-	partSlice := make([]*inventoryv1.Part, len(partsMap))
+	if filter := request.GetFilter(); filter != nil {
+		partsMap = uuidFilter.filter(partsMap, request.GetFilter().Uuids)
+		partsMap = tagFilter.filter(partsMap, request.GetFilter().Tags)
+		partsMap = nameFilter.filter(partsMap, request.GetFilter().Names)
+		partsMap = categoryFilter.filter(partsMap, request.GetFilter().Categories)
+		partsMap = manufacturerCountriesFilter.filter(partsMap, request.GetFilter().ManufactorerCountries)
 
+	}
+
+	partSlice = make([]*inventoryv1.Part, len(partsMap))
 	idx := 0
+
 	for _, v := range partsMap {
 		partSlice[idx] = v
 		idx++
@@ -123,6 +144,5 @@ func InterceptorLogger(l *slog.Logger) logging_middleware.Logger {
 	return logging_middleware.LoggerFunc(
 		func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
 			l.Log(ctx, slog.Level(lvl), msg, fields...)
-		},
-	)
+		})
 }
