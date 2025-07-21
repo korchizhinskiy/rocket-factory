@@ -12,60 +12,50 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
 
 const (
-	httpPort = "8080"
-	// Таймауты для HTTP-сервера
+	httpPort          = "8080"
 	readHeaderTimeout = 5 * time.Second
 	shutdownTimeout   = 10 * time.Second
 )
 
-type WeatherHandler struct { }
-
-func NewWeatherHandler() *WeatherHandler {
-	return &WeatherHandler{}
-}
-
-// func (h *WeatherHandler) NewError(_ context.Context, err error) *weatherV1.GenericErrorStatusCode {
-// 	return &weatherV1.GenericErrorStatusCode{
-// 		StatusCode: http.StatusInternalServerError,
-// 		Response: weatherV1.GenericError{
-// 			Code:    weatherV1.NewOptInt(http.StatusInternalServerError),
-// 			Message: weatherV1.NewOptString(err.Error()),
-// 		},
-// 	}
-// }
-
 func main() {
-	weatherHandler := NewWeatherHandler()
-
-	// weatherServer, err := weatherV1.NewServer(weatherHandler)
-	// if err != nil {
-	// 	log.Fatalf("ошибка создания сервера OpenAPI: %v", err)
-	// }
-
 	r := chi.NewRouter()
-
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(10 * time.Second))
-	// r.Use(customMiddleware.RequestLogger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+	mux := runtime.NewServeMux()
 
-	// r.Mount("/", weatherServer)
+	fileServer := http.FileServer(http.Dir("shared/api"))
 
-	// Запускаем HTTP-сервер
-	server := &http.Server{
+	r.Mount("/", mux)
+
+	r.Handle("/swagger.html", fileServer)
+	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.Dir("shared/api"))))
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger.html", http.StatusMovedPermanently)
+	})
+	srv := &http.Server{
 		Addr:              net.JoinHostPort("localhost", httpPort),
 		Handler:           r,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
 
 	go func() {
-		log.Printf("🚀 HTTP-сервер запущен на порту %s\n", httpPort)
-		err := server.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Printf("🚀 HTTP-сервер запущен на http://localhost:%s\n", httpPort)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("❌ Ошибка запуска сервера: %v\n", err)
 		}
 	}()
@@ -73,16 +63,13 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-
 	log.Println("🛑 Завершение работы сервера...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
-
-	err := server.Shutdown(ctx)
-	if err != nil {
+	if err := srv.Shutdown(ctx); err != nil {
 		log.Printf("❌ Ошибка при остановке сервера: %v\n", err)
+	} else {
+		log.Println("✅ Сервер остановлен")
 	}
-
-	log.Println("✅ Сервер остановлен")
 }

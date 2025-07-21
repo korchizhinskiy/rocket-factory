@@ -1,4 +1,5 @@
-openapi: 3.0.3
+---
+openapi: 3.1.0
 info:
   title: OrderService API
   version: 1.0.0
@@ -8,6 +9,9 @@ x-ogen:
   package: orderv1
   clean: true
 
+paths:
+  /orders:
+    $ref: "./path/create_order.yaml"
 # tags:
 #   - name: Weather
 #     description: Операции с данными о погоде — получение и обновление информации

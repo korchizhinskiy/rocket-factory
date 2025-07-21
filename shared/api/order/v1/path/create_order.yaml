@@ -1,0 +1,18 @@
+---
+post:
+  summary: Создание заказа
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../component/create_order_request.yaml"
+  responses:
+    "200":
+      description: Успешное создание заказа
+      content:
+        application/json:
+          schema:
+            $ref: "../component/create_order_response.yaml"
+    "400":
+      description: Ошибка валидации
