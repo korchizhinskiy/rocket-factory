@@ -12,9 +12,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/go-chi/cors"
 )
 
 const (
@@ -22,6 +21,11 @@ const (
 	readHeaderTimeout = 5 * time.Second
 	shutdownTimeout   = 10 * time.Second
 )
+
+type SwaggerDoc struct {
+	URL  string
+	Name string
+}
 
 func main() {
 	r := chi.NewRouter()
@@ -36,17 +40,17 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
-	mux := runtime.NewServeMux()
-
 	fileServer := http.FileServer(http.Dir("shared/api"))
 
-	r.Mount("/", mux)
+	r.Handle("/docs/*", http.StripPrefix("/docs", fileServer))
+	r.Get("/docs/swagger", SwaggerUIHandler(
+		"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+		"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+		"https://shorturl.at/YUNWT",
+		"Rocket Factory API Docs",
+		"/docs/order/v1/order.openapi.yaml",
+	))
 
-	r.Handle("/swagger.html", fileServer)
-	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.Dir("shared/api"))))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/swagger.html", http.StatusMovedPermanently)
-	})
 	srv := &http.Server{
 		Addr:              net.JoinHostPort("localhost", httpPort),
 		Handler:           r,

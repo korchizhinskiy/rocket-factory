@@ -1,0 +1,10 @@
+---
+title: OrderStatus
+type: string
+oneOf:
+  - const: PENDING_PAYMENT
+    description: Ожидается оплата
+  - const: PAID
+    description: Оплачено
+  - const: CREDIT_CARD
+    description: Отменен

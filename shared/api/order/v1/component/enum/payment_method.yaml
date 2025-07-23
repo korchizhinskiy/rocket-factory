@@ -1,0 +1,12 @@
+---
+title: PaymentMethod
+type: string
+oneOf:
+  - const: CARD
+    description: Банковская карта
+  - const: SBP
+    description: Система быстрых платежей
+  - const: CREDIT_CARD
+    description: Кредитная карта
+  - const: INVESTOR_MONEY
+    description: Средства инвестора

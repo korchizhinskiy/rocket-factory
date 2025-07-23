@@ -1,0 +1,25 @@
+---
+title: OrderDTO
+type: object
+properties:
+  order_uuid:
+    type: string
+    format: uuid
+  user_uuid:
+    type: string
+    format: uuid
+  part_uuids:
+    type: array
+    items:
+      type: string
+      format: uuid
+  total_price:
+    type: number
+    format: double
+  transaction_uuid:
+    type: string
+    format: uuid
+  patment_method:
+    $ref: "../enum/payment_method.yaml"
+  status:
+    $ref: "../enum/order_status.yaml"

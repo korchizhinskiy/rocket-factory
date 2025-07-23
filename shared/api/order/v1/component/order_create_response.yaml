@@ -1,5 +1,5 @@
 ---
-title: CreateOrderRequest
+title: CreateOrderResponse
 type: object
 required:
   - order_uuid
