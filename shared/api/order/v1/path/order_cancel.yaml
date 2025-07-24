@@ -1,0 +1,12 @@
+---
+post:
+  summary: Отмена заказа
+  tags:
+    - Order
+  responses:
+    "204":
+      description: Заказ отменен
+    "404":
+      description: Заказ не найден
+    "409":
+      description: Заказ не может быть отменен

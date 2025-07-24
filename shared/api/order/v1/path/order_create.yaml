@@ -16,5 +16,11 @@ post:
         application/json:
           schema:
             $ref: "../component/order_create_response.yaml"
-    "400":
+      links:
+        GetOrderById:
+          operationId: GetOrderById
+          parameters:
+            orderUUID: "$response.body#/order_uuid"
+
+    "422":
       description: Ошибка валидации

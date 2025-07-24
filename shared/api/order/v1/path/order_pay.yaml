@@ -4,7 +4,7 @@ post:
   tags:
     - Order
   parameters:
-    - name: order_uuid
+    - name: orderUUID
       in: path
       required: true
       schema:
@@ -23,5 +23,5 @@ post:
         application/json:
           schema:
             $ref: "../component/order_pay_response.yaml"
-    "400":
+    "422":
       description: Ошибка валидации

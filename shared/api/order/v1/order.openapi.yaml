@@ -12,11 +12,11 @@ x-ogen:
 paths:
   /orders:
     $ref: "./path/order_create.yaml"
-  /orders/{order_uuid}:
+  /orders/{orderUUID}:
     $ref: "./path/order_get.yaml"
-  /orders/{order_uuid}/pay:
+  /orders/{orderUUID}/pay:
     $ref: "./path/order_pay.yaml"
-  # /orders:
-  #   $ref: "./path/order_create.yaml"
+  /orders/{orderUUID}/cancel:
+    $ref: "./path/order_cancel.yaml"
 tags:
   - name: Order

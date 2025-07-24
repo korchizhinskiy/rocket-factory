@@ -3,8 +3,9 @@ get:
   summary: Получение заказа по идентификатору
   tags:
     - Order
+  operationId: GetOrderById
   parameters:
-    - name: order_uuid
+    - name: orderUUID
       in: path
       required: true
       schema:
@@ -12,8 +13,9 @@ get:
         format: uuid
   responses:
     "200":
-      required: true
       content:
         application/json:
           schema:
             $ref: "../component/order_get_response.yaml"
+    "404":
+      description: Заказ не найден
