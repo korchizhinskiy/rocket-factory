@@ -1,12 +1,31 @@
 ---
 post:
-  summary: Отмена заказа
+  summary: Cancel order
   tags:
     - Order
+  parameters:
+    - name: orderUUID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   responses:
     "204":
-      description: Заказ отменен
+      description: Order has been canceled
     "404":
-      description: Заказ не найден
+      description: Order has not found
     "409":
-      description: Заказ не может быть отменен
+      description: Order can not be canceled
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/internal.yaml
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/generic.yaml

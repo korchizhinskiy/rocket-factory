@@ -145,15 +145,15 @@ tasks:
           rm -rf tmp-buf
           chmod +x {{.BUF}}
         }
-        
+
   proto:update-deps:
-    deps: [ install-buf ]
+    deps: [install-buf]
     desc: Обновляет зависимости protobuf из удаленных репозиториев (googleapis и т.д.)
     cmds:
       - |
         echo "🔄 Обновляем зависимости buf..."
         {{.BUF}} dep update
-        
+
   proto:install-plugins:
     desc: "Устанавливает protoc плагины в каталог bin"
     cmds:
@@ -178,7 +178,7 @@ tasks:
     desc: Проверка .proto-файлов на соответствие стилю
     cmds:
       - "{{.BUF}} lint"
-      
+
   yq:install:
     desc: "Устанавливает yq в bin/ при необходимости"
     cmds:
@@ -198,7 +198,7 @@ tasks:
 
   ogen:gen:
     desc: "Генерация Go-кода из всех OpenAPI-деклараций с x-ogen"
-    deps: [ ogen:install, yq:install]
+    deps: [ogen:install, yq:install]
     cmds:
       - |
         TARGET=$({{.YQ}} '.x-ogen.target' {{.OPEN_API_ORDER_V1_BASE}})
