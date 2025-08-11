@@ -2,8 +2,40 @@
 
 package orderv1
 
+import (
+	"context"
+)
+
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// GetOrderById implements GetOrderById operation.
+	//
+	// Получение заказа по идентификатору.
+	//
+	// GET /orders/{orderUUID}
+	GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error)
+	// OrdersOrderUUIDCancelPost implements POST /orders/{orderUUID}/cancel operation.
+	//
+	// Cancel order.
+	//
+	// POST /orders/{orderUUID}/cancel
+	OrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (OrdersOrderUUIDCancelPostRes, error)
+	// OrdersOrderUUIDPayPost implements POST /orders/{orderUUID}/pay operation.
+	//
+	// Создание заказа.
+	//
+	// POST /orders/{orderUUID}/pay
+	OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (OrdersOrderUUIDPayPostRes, error)
+	// OrdersPost implements POST /orders operation.
+	//
+	// Создание заказа.
+	//
+	// POST /orders
+	OrdersPost(ctx context.Context, req *OrderCreateRequest) (OrdersPostRes, error)
+	// NewError creates *GenericStatusCode from error returned by handler.
+	//
+	// Used for common default response.
+	NewError(ctx context.Context, err error) *GenericStatusCode
 }
 
 // Server implements http server based on OpenAPI v3 specification and

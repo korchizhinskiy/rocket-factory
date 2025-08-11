@@ -21,6 +21,11 @@ post:
           operationId: GetOrderById
           parameters:
             orderUUID: "$response.body#/order_uuid"
-
     "422":
       description: Ошибка валидации
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/generic.yaml

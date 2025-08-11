@@ -1,10 +1,11 @@
 ---
 title: OrderStatus
 type: string
-oneOf:
-  - const: PENDING_PAYMENT
-    description: Ожидается оплата
-  - const: PAID
-    description: Оплачено
-  - const: CREDIT_CARD
-    description: Отменен
+enum:
+  - PENDING_PAYMENT
+  - PAID
+  - CANCELLED
+x-enum-descriptions:
+  PENDING_PAYMENT: Ожидается оплата
+  PAID: Оплачено
+  CANCELLED: Отменен

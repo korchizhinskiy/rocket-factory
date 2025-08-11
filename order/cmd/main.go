@@ -14,6 +14,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	orderv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/openapi/order/v1"
+	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
+	"github.com/ogen-go/ogen/gen/ir"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -26,7 +31,7 @@ type SwaggerDoc struct {
 	URL  string
 	Name string
 }
-
+func createOrder(ctx context.Context, client inventoryv1.NewInventoryServiceClient, requestData orderv1.)
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -55,6 +60,10 @@ func main() {
 		Addr:              net.JoinHostPort("localhost", httpPort),
 		Handler:           r,
 		ReadHeaderTimeout: readHeaderTimeout,
+	}
+	client, err := grpc.NewClient(srv.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return
 	}
 
 	go func() {

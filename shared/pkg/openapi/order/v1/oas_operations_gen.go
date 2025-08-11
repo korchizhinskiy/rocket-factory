@@ -5,4 +5,9 @@ package orderv1
 // OperationName is the ogen operation name
 type OperationName = string
 
-const ()
+const (
+	GetOrderByIdOperation              OperationName = "GetOrderById"
+	OrdersOrderUUIDCancelPostOperation OperationName = "OrdersOrderUUIDCancelPost"
+	OrdersOrderUUIDPayPostOperation    OperationName = "OrdersOrderUUIDPayPost"
+	OrdersPostOperation                OperationName = "OrdersPost"
+)
