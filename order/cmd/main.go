@@ -100,7 +100,10 @@ func (o *OrderHandler) APIV1OrdersOrderUUIDPayPost(
 		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
 	}
 
-	transactionUUID, _ := uuid.Parse(resp.TransactionUuid)
+	transactionUUID, err := uuid.Parse(resp.TransactionUuid)
+	if err != nil {
+		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+	}
 	(&order.Status).SetTo(orderv1.OrderStatusPAID)
 	(&order.PatmentMethod).SetTo(req.PaymentMethod)
 
@@ -111,6 +114,11 @@ func (o *OrderHandler) APIV1OrdersPost(
 	ctx context.Context,
 	req *orderv1.OrderCreateRequest,
 ) (orderv1.APIV1OrdersPostRes, error) {
+	o.storage.mu.RLock()
+	defer func() {
+		o.storage.mu.RUnlock()
+	}()
+
 	resp, err := o.invClient.ListPart(
 		ctx,
 		&inventoryv1.ListPartRequest{
@@ -134,8 +142,14 @@ func (o *OrderHandler) APIV1OrdersPost(
 			Message: "Some of part was not fount in inventory",
 		}, nil
 	}
-	orderUUID, _ := uuid.NewUUID()
-	transactionUUID, _ := uuid.NewUUID()
+	orderUUID, err := uuid.NewUUID()
+	if err != nil {
+		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+	}
+	transactionUUID, err := uuid.NewUUID()
+	if err != nil {
+		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+	}
 	order := orderv1.OrderDto{
 		OrderUUID:       orderv1.NewOptUUID(orderUUID),
 		UserUUID:        orderv1.NewOptUUID(req.UserUUID),

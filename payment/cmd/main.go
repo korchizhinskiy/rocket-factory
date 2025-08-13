@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 
 	"buf.build/go/protovalidate"
@@ -25,8 +24,6 @@ const grpcPort = 50051
 
 type paymentService struct {
 	paymentv1.UnimplementedPaymentServiceServer
-
-	mu sync.RWMutex
 }
 
 func (s *paymentService) PayOrder(
@@ -49,7 +46,11 @@ func main() {
 			logger.Info("Failed to close listener", slog.Any("error", err))
 		}
 	}()
-	validator, _ := protovalidate.New()
+	validator, err := protovalidate.New()
+	if err != nil {
+		logger.Info("Failed to create validators", slog.Any("error", err))
+		return
+	}
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			protovalidate_middleware.UnaryServerInterceptor(validator),

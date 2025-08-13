@@ -142,6 +142,8 @@ func (s *InternalError) SetMessage(val string) {
 
 func (*InternalError) aPIV1OrdersOrderUUIDCancelPostRes() {}
 func (*InternalError) aPIV1OrdersOrderUUIDPayPostRes()    {}
+func (*InternalError) aPIV1OrdersPostRes()                {}
+func (*InternalError) getOrderByIdRes()                   {}
 
 // Ref: #
 type NotFoundError struct {
