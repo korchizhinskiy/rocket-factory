@@ -10,4 +10,4 @@ properties:
     format: uuid
   total_price:
     type: number
-    format: float
+    format: double

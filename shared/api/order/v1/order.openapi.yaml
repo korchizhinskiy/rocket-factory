@@ -10,13 +10,13 @@ x-ogen:
   clean: true
 
 paths:
-  /orders:
+  /api/v1/orders:
     $ref: "./path/order_create.yaml"
-  /orders/{orderUUID}:
+  /api/v1/orders/{orderUUID}:
     $ref: "./path/order_get.yaml"
-  /orders/{orderUUID}/pay:
+  /api/v1/orders/{orderUUID}/pay:
     $ref: "./path/order_pay.yaml"
-  /orders/{orderUUID}/cancel:
+  /api/v1/orders/{orderUUID}/cancel:
     $ref: "./path/order_cancel.yaml"
 tags:
   - name: Order

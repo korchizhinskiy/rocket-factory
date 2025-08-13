@@ -13,46 +13,46 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// APIV1OrdersOrderUUIDCancelPost implements POST /api/v1/orders/{orderUUID}/cancel operation.
+//
+// Cancel order.
+//
+// POST /api/v1/orders/{orderUUID}/cancel
+func (UnimplementedHandler) APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (r APIV1OrdersOrderUUIDCancelPostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// APIV1OrdersOrderUUIDPayPost implements POST /api/v1/orders/{orderUUID}/pay operation.
+//
+// Оплата заказа.
+//
+// POST /api/v1/orders/{orderUUID}/pay
+func (UnimplementedHandler) APIV1OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (r APIV1OrdersOrderUUIDPayPostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// APIV1OrdersPost implements POST /api/v1/orders operation.
+//
+// Создание заказа.
+//
+// POST /api/v1/orders
+func (UnimplementedHandler) APIV1OrdersPost(ctx context.Context, req *OrderCreateRequest) (r APIV1OrdersPostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOrderById implements GetOrderById operation.
 //
 // Получение заказа по идентификатору.
 //
-// GET /orders/{orderUUID}
+// GET /api/v1/orders/{orderUUID}
 func (UnimplementedHandler) GetOrderById(ctx context.Context, params GetOrderByIdParams) (r GetOrderByIdRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// OrdersOrderUUIDCancelPost implements POST /orders/{orderUUID}/cancel operation.
-//
-// Cancel order.
-//
-// POST /orders/{orderUUID}/cancel
-func (UnimplementedHandler) OrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (r OrdersOrderUUIDCancelPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OrdersOrderUUIDPayPost implements POST /orders/{orderUUID}/pay operation.
-//
-// Создание заказа.
-//
-// POST /orders/{orderUUID}/pay
-func (UnimplementedHandler) OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (r OrdersOrderUUIDPayPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OrdersPost implements POST /orders operation.
-//
-// Создание заказа.
-//
-// POST /orders
-func (UnimplementedHandler) OrdersPost(ctx context.Context, req *OrderCreateRequest) (r OrdersPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// NewError creates *GenericStatusCode from error returned by handler.
+// NewError creates *GenericErrorStatusCode from error returned by handler.
 //
 // Used for common default response.
-func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *GenericStatusCode) {
-	r = new(GenericStatusCode)
+func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *GenericErrorStatusCode) {
+	r = new(GenericErrorStatusCode)
 	return r
 }

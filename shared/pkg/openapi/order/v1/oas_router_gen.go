@@ -49,9 +49,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/orders"
+		case '/': // Prefix: "/api/v1/orders"
 
-			if l := len("/orders"); len(elem) >= l && elem[0:l] == "/orders" {
+			if l := len("/api/v1/orders"); len(elem) >= l && elem[0:l] == "/api/v1/orders" {
 				elem = elem[l:]
 			} else {
 				break
@@ -60,7 +60,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if len(elem) == 0 {
 				switch r.Method {
 				case "POST":
-					s.handleOrdersPostRequest([0]string{}, elemIsEscaped, w, r)
+					s.handleAPIV1OrdersPostRequest([0]string{}, elemIsEscaped, w, r)
 				default:
 					s.notAllowed(w, r, "POST")
 				}
@@ -122,7 +122,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleOrdersOrderUUIDCancelPostRequest([1]string{
+								s.handleAPIV1OrdersOrderUUIDCancelPostRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -144,7 +144,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleOrdersOrderUUIDPayPostRequest([1]string{
+								s.handleAPIV1OrdersOrderUUIDPayPostRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -240,9 +240,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/orders"
+		case '/': // Prefix: "/api/v1/orders"
 
-			if l := len("/orders"); len(elem) >= l && elem[0:l] == "/orders" {
+			if l := len("/api/v1/orders"); len(elem) >= l && elem[0:l] == "/api/v1/orders" {
 				elem = elem[l:]
 			} else {
 				break
@@ -251,10 +251,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			if len(elem) == 0 {
 				switch method {
 				case "POST":
-					r.name = OrdersPostOperation
+					r.name = APIV1OrdersPostOperation
 					r.summary = "Создание заказа"
 					r.operationID = ""
-					r.pathPattern = "/orders"
+					r.pathPattern = "/api/v1/orders"
 					r.args = args
 					r.count = 0
 					return r, true
@@ -286,7 +286,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetOrderByIdOperation
 						r.summary = "Получение заказа по идентификатору"
 						r.operationID = "GetOrderById"
-						r.pathPattern = "/orders/{orderUUID}"
+						r.pathPattern = "/api/v1/orders/{orderUUID}"
 						r.args = args
 						r.count = 1
 						return r, true
@@ -319,10 +319,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "POST":
-								r.name = OrdersOrderUUIDCancelPostOperation
+								r.name = APIV1OrdersOrderUUIDCancelPostOperation
 								r.summary = "Cancel order"
 								r.operationID = ""
-								r.pathPattern = "/orders/{orderUUID}/cancel"
+								r.pathPattern = "/api/v1/orders/{orderUUID}/cancel"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -343,10 +343,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "POST":
-								r.name = OrdersOrderUUIDPayPostOperation
-								r.summary = "Создание заказа"
+								r.name = APIV1OrdersOrderUUIDPayPostOperation
+								r.summary = "Оплата заказа"
 								r.operationID = ""
-								r.pathPattern = "/orders/{orderUUID}/pay"
+								r.pathPattern = "/api/v1/orders/{orderUUID}/pay"
 								r.args = args
 								r.count = 1
 								return r, true

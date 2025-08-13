@@ -9,71 +9,27 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *GenericStatusCode) Error() string {
+func (s *GenericErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
-// Ref: #
-type Generic struct {
-	// Error HTTP-code.
-	Code OptInt `json:"code"`
-	// Error description.
-	Message OptString `json:"message"`
-}
+// APIV1OrdersOrderUUIDCancelPostNoContent is response for APIV1OrdersOrderUUIDCancelPost operation.
+type APIV1OrdersOrderUUIDCancelPostNoContent struct{}
 
-// GetCode returns the value of Code.
-func (s *Generic) GetCode() OptInt {
-	return s.Code
-}
+func (*APIV1OrdersOrderUUIDCancelPostNoContent) aPIV1OrdersOrderUUIDCancelPostRes() {}
 
-// GetMessage returns the value of Message.
-func (s *Generic) GetMessage() OptString {
-	return s.Message
-}
+// APIV1OrdersOrderUUIDPayPostUnprocessableEntity is response for APIV1OrdersOrderUUIDPayPost operation.
+type APIV1OrdersOrderUUIDPayPostUnprocessableEntity struct{}
 
-// SetCode sets the value of Code.
-func (s *Generic) SetCode(val OptInt) {
-	s.Code = val
-}
+func (*APIV1OrdersOrderUUIDPayPostUnprocessableEntity) aPIV1OrdersOrderUUIDPayPostRes() {}
 
-// SetMessage sets the value of Message.
-func (s *Generic) SetMessage(val OptString) {
-	s.Message = val
-}
+// APIV1OrdersPostUnprocessableEntity is response for APIV1OrdersPost operation.
+type APIV1OrdersPostUnprocessableEntity struct{}
 
-// GenericStatusCode wraps Generic with StatusCode.
-type GenericStatusCode struct {
-	StatusCode int
-	Response   Generic
-}
-
-// GetStatusCode returns the value of StatusCode.
-func (s *GenericStatusCode) GetStatusCode() int {
-	return s.StatusCode
-}
-
-// GetResponse returns the value of Response.
-func (s *GenericStatusCode) GetResponse() Generic {
-	return s.Response
-}
-
-// SetStatusCode sets the value of StatusCode.
-func (s *GenericStatusCode) SetStatusCode(val int) {
-	s.StatusCode = val
-}
-
-// SetResponse sets the value of Response.
-func (s *GenericStatusCode) SetResponse(val Generic) {
-	s.Response = val
-}
-
-// GetOrderByIdNotFound is response for GetOrderById operation.
-type GetOrderByIdNotFound struct{}
-
-func (*GetOrderByIdNotFound) getOrderByIdRes() {}
+func (*APIV1OrdersPostUnprocessableEntity) aPIV1OrdersPostRes() {}
 
 // Ref: #
-type Internal struct {
+type ConflictError struct {
 	// Error HTTP-code.
 	Code int `json:"code"`
 	// Error description.
@@ -81,26 +37,144 @@ type Internal struct {
 }
 
 // GetCode returns the value of Code.
-func (s *Internal) GetCode() int {
+func (s *ConflictError) GetCode() int {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *Internal) GetMessage() string {
+func (s *ConflictError) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *Internal) SetCode(val int) {
+func (s *ConflictError) SetCode(val int) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *Internal) SetMessage(val string) {
+func (s *ConflictError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*Internal) ordersOrderUUIDCancelPostRes() {}
+func (*ConflictError) aPIV1OrdersOrderUUIDCancelPostRes() {}
+
+// Ref: #
+type GenericError struct {
+	// Error HTTP-code.
+	Code int `json:"code"`
+	// Error description.
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GenericError) GetCode() int {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GenericError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GenericError) SetCode(val int) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GenericError) SetMessage(val string) {
+	s.Message = val
+}
+
+// GenericErrorStatusCode wraps GenericError with StatusCode.
+type GenericErrorStatusCode struct {
+	StatusCode int
+	Response   GenericError
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *GenericErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *GenericErrorStatusCode) GetResponse() GenericError {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *GenericErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *GenericErrorStatusCode) SetResponse(val GenericError) {
+	s.Response = val
+}
+
+// Ref: #
+type InternalError struct {
+	// Error HTTP-code.
+	Code int `json:"code"`
+	// Error description.
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *InternalError) GetCode() int {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *InternalError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *InternalError) SetCode(val int) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *InternalError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*InternalError) aPIV1OrdersOrderUUIDCancelPostRes() {}
+func (*InternalError) aPIV1OrdersOrderUUIDPayPostRes()    {}
+
+// Ref: #
+type NotFoundError struct {
+	// HTTP-код ошибки.
+	Code int `json:"code"`
+	// Описание ошибки.
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *NotFoundError) GetCode() int {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *NotFoundError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *NotFoundError) SetCode(val int) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *NotFoundError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*NotFoundError) aPIV1OrdersOrderUUIDCancelPostRes() {}
+func (*NotFoundError) aPIV1OrdersOrderUUIDPayPostRes()    {}
+func (*NotFoundError) aPIV1OrdersPostRes()                {}
+func (*NotFoundError) getOrderByIdRes()                   {}
 
 // NewOptFloat64 returns new OptFloat64 with value set to v.
 func NewOptFloat64(v float64) OptFloat64 {
@@ -142,52 +216,6 @@ func (o OptFloat64) Get() (v float64, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptFloat64) Or(d float64) float64 {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt is optional int.
-type OptInt struct {
-	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -286,52 +314,6 @@ func (o OptPaymentMethod) Or(d PaymentMethod) PaymentMethod {
 	return d
 }
 
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptString is optional string.
-type OptString struct {
-	Value string
-	Set   bool
-}
-
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptUUID returns new OptUUID with value set to v.
 func NewOptUUID(v uuid.UUID) OptUUID {
 	return OptUUID{
@@ -407,7 +389,7 @@ func (s *OrderCreateRequest) SetPartUuids(val []uuid.UUID) {
 // Ref: #
 type OrderCreateResponse struct {
 	OrderUUID  uuid.UUID `json:"order_uuid"`
-	TotalPrice float32   `json:"total_price"`
+	TotalPrice float64   `json:"total_price"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
@@ -416,7 +398,7 @@ func (s *OrderCreateResponse) GetOrderUUID() uuid.UUID {
 }
 
 // GetTotalPrice returns the value of TotalPrice.
-func (s *OrderCreateResponse) GetTotalPrice() float32 {
+func (s *OrderCreateResponse) GetTotalPrice() float64 {
 	return s.TotalPrice
 }
 
@@ -426,11 +408,11 @@ func (s *OrderCreateResponse) SetOrderUUID(val uuid.UUID) {
 }
 
 // SetTotalPrice sets the value of TotalPrice.
-func (s *OrderCreateResponse) SetTotalPrice(val float32) {
+func (s *OrderCreateResponse) SetTotalPrice(val float64) {
 	s.TotalPrice = val
 }
 
-func (*OrderCreateResponse) ordersPostRes() {}
+func (*OrderCreateResponse) aPIV1OrdersPostRes() {}
 
 // Ref: #
 type OrderDto struct {
@@ -518,6 +500,7 @@ func (*OrderDto) getOrderByIdRes() {}
 // Ref: #
 type OrderPayRequest struct {
 	PaymentMethod PaymentMethod `json:"payment_method"`
+	UserUUID      uuid.UUID     `json:"user_uuid"`
 }
 
 // GetPaymentMethod returns the value of PaymentMethod.
@@ -525,9 +508,19 @@ func (s *OrderPayRequest) GetPaymentMethod() PaymentMethod {
 	return s.PaymentMethod
 }
 
+// GetUserUUID returns the value of UserUUID.
+func (s *OrderPayRequest) GetUserUUID() uuid.UUID {
+	return s.UserUUID
+}
+
 // SetPaymentMethod sets the value of PaymentMethod.
 func (s *OrderPayRequest) SetPaymentMethod(val PaymentMethod) {
 	s.PaymentMethod = val
+}
+
+// SetUserUUID sets the value of UserUUID.
+func (s *OrderPayRequest) SetUserUUID(val uuid.UUID) {
+	s.UserUUID = val
 }
 
 // Ref: #
@@ -545,7 +538,7 @@ func (s *OrderPayResponse) SetTransactionUUID(val uuid.UUID) {
 	s.TransactionUUID = val
 }
 
-func (*OrderPayResponse) ordersOrderUUIDPayPostRes() {}
+func (*OrderPayResponse) aPIV1OrdersOrderUUIDPayPostRes() {}
 
 // Ref: #
 type OrderStatus string
@@ -595,31 +588,6 @@ func (s *OrderStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
-
-// OrdersOrderUUIDCancelPostConflict is response for OrdersOrderUUIDCancelPost operation.
-type OrdersOrderUUIDCancelPostConflict struct{}
-
-func (*OrdersOrderUUIDCancelPostConflict) ordersOrderUUIDCancelPostRes() {}
-
-// OrdersOrderUUIDCancelPostNoContent is response for OrdersOrderUUIDCancelPost operation.
-type OrdersOrderUUIDCancelPostNoContent struct{}
-
-func (*OrdersOrderUUIDCancelPostNoContent) ordersOrderUUIDCancelPostRes() {}
-
-// OrdersOrderUUIDCancelPostNotFound is response for OrdersOrderUUIDCancelPost operation.
-type OrdersOrderUUIDCancelPostNotFound struct{}
-
-func (*OrdersOrderUUIDCancelPostNotFound) ordersOrderUUIDCancelPostRes() {}
-
-// OrdersOrderUUIDPayPostUnprocessableEntity is response for OrdersOrderUUIDPayPost operation.
-type OrdersOrderUUIDPayPostUnprocessableEntity struct{}
-
-func (*OrdersOrderUUIDPayPostUnprocessableEntity) ordersOrderUUIDPayPostRes() {}
-
-// OrdersPostUnprocessableEntity is response for OrdersPost operation.
-type OrdersPostUnprocessableEntity struct{}
-
-func (*OrdersPostUnprocessableEntity) ordersPostRes() {}
 
 // Ref: #
 type PaymentMethod string

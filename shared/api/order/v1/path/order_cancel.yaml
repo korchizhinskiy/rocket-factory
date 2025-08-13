@@ -15,17 +15,25 @@ post:
       description: Order has been canceled
     "404":
       description: Order has not found
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/not_found_error.yaml
     "409":
       description: Order can not be canceled
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/conflict_error.yaml
     "500":
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: ../component/error/internal.yaml
+            $ref: ../component/error/internal_error.yaml
     default:
       description: Unexpected error
       content:
         application/json:
           schema:
-            $ref: ../component/error/generic.yaml
+            $ref: ../component/error/generic_error.yaml

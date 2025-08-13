@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *Server) decodeOrdersOrderUUIDPayPostRequest(r *http.Request) (
+func (s *Server) decodeAPIV1OrdersOrderUUIDPayPostRequest(r *http.Request) (
 	req *OrderPayRequest,
 	close func() error,
 	rerr error,
@@ -85,7 +85,7 @@ func (s *Server) decodeOrdersOrderUUIDPayPostRequest(r *http.Request) (
 	}
 }
 
-func (s *Server) decodeOrdersPostRequest(r *http.Request) (
+func (s *Server) decodeAPIV1OrdersPostRequest(r *http.Request) (
 	req *OrderCreateRequest,
 	close func() error,
 	rerr error,

@@ -8,34 +8,34 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// APIV1OrdersOrderUUIDCancelPost implements POST /api/v1/orders/{orderUUID}/cancel operation.
+	//
+	// Cancel order.
+	//
+	// POST /api/v1/orders/{orderUUID}/cancel
+	APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (APIV1OrdersOrderUUIDCancelPostRes, error)
+	// APIV1OrdersOrderUUIDPayPost implements POST /api/v1/orders/{orderUUID}/pay operation.
+	//
+	// Оплата заказа.
+	//
+	// POST /api/v1/orders/{orderUUID}/pay
+	APIV1OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (APIV1OrdersOrderUUIDPayPostRes, error)
+	// APIV1OrdersPost implements POST /api/v1/orders operation.
+	//
+	// Создание заказа.
+	//
+	// POST /api/v1/orders
+	APIV1OrdersPost(ctx context.Context, req *OrderCreateRequest) (APIV1OrdersPostRes, error)
 	// GetOrderById implements GetOrderById operation.
 	//
 	// Получение заказа по идентификатору.
 	//
-	// GET /orders/{orderUUID}
+	// GET /api/v1/orders/{orderUUID}
 	GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error)
-	// OrdersOrderUUIDCancelPost implements POST /orders/{orderUUID}/cancel operation.
-	//
-	// Cancel order.
-	//
-	// POST /orders/{orderUUID}/cancel
-	OrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (OrdersOrderUUIDCancelPostRes, error)
-	// OrdersOrderUUIDPayPost implements POST /orders/{orderUUID}/pay operation.
-	//
-	// Создание заказа.
-	//
-	// POST /orders/{orderUUID}/pay
-	OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (OrdersOrderUUIDPayPostRes, error)
-	// OrdersPost implements POST /orders operation.
-	//
-	// Создание заказа.
-	//
-	// POST /orders
-	OrdersPost(ctx context.Context, req *OrderCreateRequest) (OrdersPostRes, error)
-	// NewError creates *GenericStatusCode from error returned by handler.
+	// NewError creates *GenericErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.
-	NewError(ctx context.Context, err error) *GenericStatusCode
+	NewError(ctx context.Context, err error) *GenericErrorStatusCode
 }
 
 // Server implements http server based on OpenAPI v3 specification and

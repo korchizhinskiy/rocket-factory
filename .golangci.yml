@@ -63,7 +63,6 @@ linters: # Список активных и отключённых линтер�
           show-ignored: true
         severity: "medium"
         confidence: "medium"
-        
     cyclop:
       max-complexity: 20
 

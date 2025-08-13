@@ -11,7 +11,7 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeOrdersOrderUUIDPayPostRequest(
+func encodeAPIV1OrdersOrderUUIDPayPostRequest(
 	req *OrderPayRequest,
 	r *http.Request,
 ) error {
@@ -25,7 +25,7 @@ func encodeOrdersOrderUUIDPayPostRequest(
 	return nil
 }
 
-func encodeOrdersPostRequest(
+func encodeAPIV1OrdersPostRequest(
 	req *OrderCreateRequest,
 	r *http.Request,
 ) error {

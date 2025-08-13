@@ -28,30 +28,30 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
+	// APIV1OrdersOrderUUIDCancelPost invokes POST /api/v1/orders/{orderUUID}/cancel operation.
+	//
+	// Cancel order.
+	//
+	// POST /api/v1/orders/{orderUUID}/cancel
+	APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (APIV1OrdersOrderUUIDCancelPostRes, error)
+	// APIV1OrdersOrderUUIDPayPost invokes POST /api/v1/orders/{orderUUID}/pay operation.
+	//
+	// Оплата заказа.
+	//
+	// POST /api/v1/orders/{orderUUID}/pay
+	APIV1OrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (APIV1OrdersOrderUUIDPayPostRes, error)
+	// APIV1OrdersPost invokes POST /api/v1/orders operation.
+	//
+	// Создание заказа.
+	//
+	// POST /api/v1/orders
+	APIV1OrdersPost(ctx context.Context, request *OrderCreateRequest) (APIV1OrdersPostRes, error)
 	// GetOrderById invokes GetOrderById operation.
 	//
 	// Получение заказа по идентификатору.
 	//
-	// GET /orders/{orderUUID}
+	// GET /api/v1/orders/{orderUUID}
 	GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error)
-	// OrdersOrderUUIDCancelPost invokes POST /orders/{orderUUID}/cancel operation.
-	//
-	// Cancel order.
-	//
-	// POST /orders/{orderUUID}/cancel
-	OrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (OrdersOrderUUIDCancelPostRes, error)
-	// OrdersOrderUUIDPayPost invokes POST /orders/{orderUUID}/pay operation.
-	//
-	// Создание заказа.
-	//
-	// POST /orders/{orderUUID}/pay
-	OrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (OrdersOrderUUIDPayPostRes, error)
-	// OrdersPost invokes POST /orders operation.
-	//
-	// Создание заказа.
-	//
-	// POST /orders
-	OrdersPost(ctx context.Context, request *OrderCreateRequest) (OrdersPostRes, error)
 }
 
 // Client implements OAS client.
@@ -60,7 +60,7 @@ type Client struct {
 	baseClient
 }
 type errorHandler interface {
-	NewError(ctx context.Context, err error) *GenericStatusCode
+	NewError(ctx context.Context, err error) *GenericErrorStatusCode
 }
 
 var _ Handler = struct {
@@ -101,110 +101,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// GetOrderById invokes GetOrderById operation.
-//
-// Получение заказа по идентификатору.
-//
-// GET /orders/{orderUUID}
-func (c *Client) GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error) {
-	res, err := c.sendGetOrderById(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetOrderById(ctx context.Context, params GetOrderByIdParams) (res GetOrderByIdRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("GetOrderById"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/orders/{orderUUID}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, GetOrderByIdOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/orders/"
-	{
-		// Encode "orderUUID" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "orderUUID",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.OrderUUID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeGetOrderByIdResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// OrdersOrderUUIDCancelPost invokes POST /orders/{orderUUID}/cancel operation.
+// APIV1OrdersOrderUUIDCancelPost invokes POST /api/v1/orders/{orderUUID}/cancel operation.
 //
 // Cancel order.
 //
-// POST /orders/{orderUUID}/cancel
-func (c *Client) OrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (OrdersOrderUUIDCancelPostRes, error) {
-	res, err := c.sendOrdersOrderUUIDCancelPost(ctx, params)
+// POST /api/v1/orders/{orderUUID}/cancel
+func (c *Client) APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (APIV1OrdersOrderUUIDCancelPostRes, error) {
+	res, err := c.sendAPIV1OrdersOrderUUIDCancelPost(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendOrdersOrderUUIDCancelPost(ctx context.Context, params OrdersOrderUUIDCancelPostParams) (res OrdersOrderUUIDCancelPostRes, err error) {
+func (c *Client) sendAPIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (res APIV1OrdersOrderUUIDCancelPostRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/orders/{orderUUID}/cancel"),
+		semconv.HTTPRouteKey.String("/api/v1/orders/{orderUUID}/cancel"),
 	}
 
 	// Run stopwatch.
@@ -219,7 +129,7 @@ func (c *Client) sendOrdersOrderUUIDCancelPost(ctx context.Context, params Order
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrdersOrderUUIDCancelPostOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, APIV1OrdersOrderUUIDCancelPostOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -237,7 +147,7 @@ func (c *Client) sendOrdersOrderUUIDCancelPost(ctx context.Context, params Order
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string
-	pathParts[0] = "/orders/"
+	pathParts[0] = "/api/v1/orders/"
 	{
 		// Encode "orderUUID" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -273,7 +183,7 @@ func (c *Client) sendOrdersOrderUUIDCancelPost(ctx context.Context, params Order
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrdersOrderUUIDCancelPostResponse(resp)
+	result, err := decodeAPIV1OrdersOrderUUIDCancelPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -281,20 +191,20 @@ func (c *Client) sendOrdersOrderUUIDCancelPost(ctx context.Context, params Order
 	return result, nil
 }
 
-// OrdersOrderUUIDPayPost invokes POST /orders/{orderUUID}/pay operation.
+// APIV1OrdersOrderUUIDPayPost invokes POST /api/v1/orders/{orderUUID}/pay operation.
 //
-// Создание заказа.
+// Оплата заказа.
 //
-// POST /orders/{orderUUID}/pay
-func (c *Client) OrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (OrdersOrderUUIDPayPostRes, error) {
-	res, err := c.sendOrdersOrderUUIDPayPost(ctx, request, params)
+// POST /api/v1/orders/{orderUUID}/pay
+func (c *Client) APIV1OrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (APIV1OrdersOrderUUIDPayPostRes, error) {
+	res, err := c.sendAPIV1OrdersOrderUUIDPayPost(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params OrdersOrderUUIDPayPostParams) (res OrdersOrderUUIDPayPostRes, err error) {
+func (c *Client) sendAPIV1OrdersOrderUUIDPayPost(ctx context.Context, request *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (res APIV1OrdersOrderUUIDPayPostRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/orders/{orderUUID}/pay"),
+		semconv.HTTPRouteKey.String("/api/v1/orders/{orderUUID}/pay"),
 	}
 
 	// Run stopwatch.
@@ -309,7 +219,7 @@ func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderP
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrdersOrderUUIDPayPostOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, APIV1OrdersOrderUUIDPayPostOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -327,7 +237,7 @@ func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderP
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string
-	pathParts[0] = "/orders/"
+	pathParts[0] = "/api/v1/orders/"
 	{
 		// Encode "orderUUID" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -354,7 +264,7 @@ func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderP
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeOrdersOrderUUIDPayPostRequest(request, r); err != nil {
+	if err := encodeAPIV1OrdersOrderUUIDPayPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -366,7 +276,7 @@ func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderP
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrdersOrderUUIDPayPostResponse(resp)
+	result, err := decodeAPIV1OrdersOrderUUIDPayPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -374,20 +284,20 @@ func (c *Client) sendOrdersOrderUUIDPayPost(ctx context.Context, request *OrderP
 	return result, nil
 }
 
-// OrdersPost invokes POST /orders operation.
+// APIV1OrdersPost invokes POST /api/v1/orders operation.
 //
 // Создание заказа.
 //
-// POST /orders
-func (c *Client) OrdersPost(ctx context.Context, request *OrderCreateRequest) (OrdersPostRes, error) {
-	res, err := c.sendOrdersPost(ctx, request)
+// POST /api/v1/orders
+func (c *Client) APIV1OrdersPost(ctx context.Context, request *OrderCreateRequest) (APIV1OrdersPostRes, error) {
+	res, err := c.sendAPIV1OrdersPost(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendOrdersPost(ctx context.Context, request *OrderCreateRequest) (res OrdersPostRes, err error) {
+func (c *Client) sendAPIV1OrdersPost(ctx context.Context, request *OrderCreateRequest) (res APIV1OrdersPostRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/orders"),
+		semconv.HTTPRouteKey.String("/api/v1/orders"),
 	}
 
 	// Run stopwatch.
@@ -402,7 +312,7 @@ func (c *Client) sendOrdersPost(ctx context.Context, request *OrderCreateRequest
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrdersPostOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, APIV1OrdersPostOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -420,7 +330,7 @@ func (c *Client) sendOrdersPost(ctx context.Context, request *OrderCreateRequest
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/orders"
+	pathParts[0] = "/api/v1/orders"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -428,7 +338,7 @@ func (c *Client) sendOrdersPost(ctx context.Context, request *OrderCreateRequest
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeOrdersPostRequest(request, r); err != nil {
+	if err := encodeAPIV1OrdersPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -440,7 +350,97 @@ func (c *Client) sendOrdersPost(ctx context.Context, request *OrderCreateRequest
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrdersPostResponse(resp)
+	result, err := decodeAPIV1OrdersPostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetOrderById invokes GetOrderById operation.
+//
+// Получение заказа по идентификатору.
+//
+// GET /api/v1/orders/{orderUUID}
+func (c *Client) GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error) {
+	res, err := c.sendGetOrderById(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetOrderById(ctx context.Context, params GetOrderByIdParams) (res GetOrderByIdRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("GetOrderById"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/v1/orders/{orderUUID}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GetOrderByIdOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/api/v1/orders/"
+	{
+		// Encode "orderUUID" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "orderUUID",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.OrderUUID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGetOrderByIdResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

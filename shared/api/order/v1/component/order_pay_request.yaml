@@ -3,6 +3,10 @@ title: PayOrderRequest
 type: object
 required:
   - payment_method
+  - user_uuid
 properties:
   payment_method:
     $ref: "../component/enum/payment_method.yaml"
+  user_uuid:
+    type: string
+    format: uuid

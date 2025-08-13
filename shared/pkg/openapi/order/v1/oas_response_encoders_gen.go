@@ -13,12 +13,18 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeGetOrderByIdResponse(response GetOrderByIdRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPIV1OrdersOrderUUIDCancelPostResponse(response APIV1OrdersOrderUUIDCancelPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *OrderDto:
+	case *APIV1OrdersOrderUUIDCancelPostNoContent:
+		w.WriteHeader(204)
+		span.SetStatus(codes.Ok, http.StatusText(204))
+
+		return nil
+
+	case *NotFoundError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -28,38 +34,20 @@ func encodeGetOrderByIdResponse(response GetOrderByIdRes, w http.ResponseWriter,
 
 		return nil
 
-	case *GetOrderByIdNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeOrdersOrderUUIDCancelPostResponse(response OrdersOrderUUIDCancelPostRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OrdersOrderUUIDCancelPostNoContent:
-		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
-
-		return nil
-
-	case *OrdersOrderUUIDCancelPostNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	case *OrdersOrderUUIDCancelPostConflict:
+	case *ConflictError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(409)
 		span.SetStatus(codes.Error, http.StatusText(409))
 
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
 		return nil
 
-	case *Internal:
+	case *InternalError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -77,7 +65,7 @@ func encodeOrdersOrderUUIDCancelPostResponse(response OrdersOrderUUIDCancelPostR
 	}
 }
 
-func encodeOrdersOrderUUIDPayPostResponse(response OrdersOrderUUIDPayPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPIV1OrdersOrderUUIDPayPostResponse(response APIV1OrdersOrderUUIDPayPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *OrderPayResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -92,9 +80,35 @@ func encodeOrdersOrderUUIDPayPostResponse(response OrdersOrderUUIDPayPostRes, w 
 
 		return nil
 
-	case *OrdersOrderUUIDPayPostUnprocessableEntity:
+	case *NotFoundError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APIV1OrdersOrderUUIDPayPostUnprocessableEntity:
 		w.WriteHeader(422)
 		span.SetStatus(codes.Error, http.StatusText(422))
+
+		return nil
+
+	case *InternalError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 
 		return nil
 
@@ -103,7 +117,7 @@ func encodeOrdersOrderUUIDPayPostResponse(response OrdersOrderUUIDPayPostRes, w 
 	}
 }
 
-func encodeOrdersPostResponse(response OrdersPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPIV1OrdersPostResponse(response APIV1OrdersPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *OrderCreateResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -118,7 +132,20 @@ func encodeOrdersPostResponse(response OrdersPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *OrdersPostUnprocessableEntity:
+	case *NotFoundError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APIV1OrdersPostUnprocessableEntity:
 		w.WriteHeader(422)
 		span.SetStatus(codes.Error, http.StatusText(422))
 
@@ -129,7 +156,40 @@ func encodeOrdersPostResponse(response OrdersPostRes, w http.ResponseWriter, spa
 	}
 }
 
-func encodeErrorResponse(response *GenericStatusCode, w http.ResponseWriter, span trace.Span) error {
+func encodeGetOrderByIdResponse(response GetOrderByIdRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *OrderDto:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *NotFoundError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeErrorResponse(response *GenericErrorStatusCode, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	code := response.StatusCode
 	if code == 0 {

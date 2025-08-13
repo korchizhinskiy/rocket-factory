@@ -19,9 +19,13 @@ get:
             $ref: "../component/order_get_response.yaml"
     "404":
       description: Заказ не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../component/error/not_found_error.yaml"
     default:
       description: Unexpected error
       content:
         application/json:
           schema:
-            $ref: "../component/error/generic.yaml"
+            $ref: "../component/error/generic_error.yaml"
