@@ -1,6 +1,7 @@
 ---
 post:
   summary: Создание заказа
+  operationId: CreateOrder
   tags:
     - Order
   requestBody:

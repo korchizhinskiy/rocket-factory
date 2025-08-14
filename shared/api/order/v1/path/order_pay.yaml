@@ -1,6 +1,7 @@
 ---
 post:
   summary: Оплата заказа
+  operationId: PayOrder
   tags:
     - Order
   parameters:

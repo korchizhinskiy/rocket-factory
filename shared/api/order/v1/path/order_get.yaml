@@ -1,9 +1,9 @@
 ---
 get:
   summary: Получение заказа по идентификатору
+  operationId: GetOrderByID
   tags:
     - Order
-  operationId: GetOrderById
   parameters:
     - name: orderUUID
       in: path

@@ -1,6 +1,7 @@
 ---
 post:
   summary: Cancel order
+  operationId: CancelOrder
   tags:
     - Order
   parameters:

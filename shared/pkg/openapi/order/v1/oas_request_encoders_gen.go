@@ -11,8 +11,8 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeAPIV1OrdersOrderUUIDPayPostRequest(
-	req *OrderPayRequest,
+func encodeCreateOrderRequest(
+	req *OrderCreateRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -25,8 +25,8 @@ func encodeAPIV1OrdersOrderUUIDPayPostRequest(
 	return nil
 }
 
-func encodeAPIV1OrdersPostRequest(
-	req *OrderCreateRequest,
+func encodePayOrderRequest(
+	req *OrderPayRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

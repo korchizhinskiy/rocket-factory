@@ -6,8 +6,8 @@ package orderv1
 type OperationName = string
 
 const (
-	APIV1OrdersOrderUUIDCancelPostOperation OperationName = "APIV1OrdersOrderUUIDCancelPost"
-	APIV1OrdersOrderUUIDPayPostOperation    OperationName = "APIV1OrdersOrderUUIDPayPost"
-	APIV1OrdersPostOperation                OperationName = "APIV1OrdersPost"
-	GetOrderByIdOperation                   OperationName = "GetOrderById"
+	CancelOrderOperation  OperationName = "CancelOrder"
+	CreateOrderOperation  OperationName = "CreateOrder"
+	GetOrderByIDOperation OperationName = "GetOrderByID"
+	PayOrderOperation     OperationName = "PayOrder"
 )

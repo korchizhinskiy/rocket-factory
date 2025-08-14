@@ -13,20 +13,10 @@ func (s *GenericErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
-// APIV1OrdersOrderUUIDCancelPostNoContent is response for APIV1OrdersOrderUUIDCancelPost operation.
-type APIV1OrdersOrderUUIDCancelPostNoContent struct{}
+// CancelOrderNoContent is response for CancelOrder operation.
+type CancelOrderNoContent struct{}
 
-func (*APIV1OrdersOrderUUIDCancelPostNoContent) aPIV1OrdersOrderUUIDCancelPostRes() {}
-
-// APIV1OrdersOrderUUIDPayPostUnprocessableEntity is response for APIV1OrdersOrderUUIDPayPost operation.
-type APIV1OrdersOrderUUIDPayPostUnprocessableEntity struct{}
-
-func (*APIV1OrdersOrderUUIDPayPostUnprocessableEntity) aPIV1OrdersOrderUUIDPayPostRes() {}
-
-// APIV1OrdersPostUnprocessableEntity is response for APIV1OrdersPost operation.
-type APIV1OrdersPostUnprocessableEntity struct{}
-
-func (*APIV1OrdersPostUnprocessableEntity) aPIV1OrdersPostRes() {}
+func (*CancelOrderNoContent) cancelOrderRes() {}
 
 // Ref: #
 type ConflictError struct {
@@ -56,7 +46,12 @@ func (s *ConflictError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*ConflictError) aPIV1OrdersOrderUUIDCancelPostRes() {}
+func (*ConflictError) cancelOrderRes() {}
+
+// CreateOrderUnprocessableEntity is response for CreateOrder operation.
+type CreateOrderUnprocessableEntity struct{}
+
+func (*CreateOrderUnprocessableEntity) createOrderRes() {}
 
 // Ref: #
 type GenericError struct {
@@ -140,10 +135,10 @@ func (s *InternalError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*InternalError) aPIV1OrdersOrderUUIDCancelPostRes() {}
-func (*InternalError) aPIV1OrdersOrderUUIDPayPostRes()    {}
-func (*InternalError) aPIV1OrdersPostRes()                {}
-func (*InternalError) getOrderByIdRes()                   {}
+func (*InternalError) cancelOrderRes()  {}
+func (*InternalError) createOrderRes()  {}
+func (*InternalError) getOrderByIDRes() {}
+func (*InternalError) payOrderRes()     {}
 
 // Ref: #
 type NotFoundError struct {
@@ -173,10 +168,10 @@ func (s *NotFoundError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*NotFoundError) aPIV1OrdersOrderUUIDCancelPostRes() {}
-func (*NotFoundError) aPIV1OrdersOrderUUIDPayPostRes()    {}
-func (*NotFoundError) aPIV1OrdersPostRes()                {}
-func (*NotFoundError) getOrderByIdRes()                   {}
+func (*NotFoundError) cancelOrderRes()  {}
+func (*NotFoundError) createOrderRes()  {}
+func (*NotFoundError) getOrderByIDRes() {}
+func (*NotFoundError) payOrderRes()     {}
 
 // NewOptFloat64 returns new OptFloat64 with value set to v.
 func NewOptFloat64(v float64) OptFloat64 {
@@ -414,7 +409,7 @@ func (s *OrderCreateResponse) SetTotalPrice(val float64) {
 	s.TotalPrice = val
 }
 
-func (*OrderCreateResponse) aPIV1OrdersPostRes() {}
+func (*OrderCreateResponse) createOrderRes() {}
 
 // Ref: #
 type OrderDto struct {
@@ -497,7 +492,7 @@ func (s *OrderDto) SetStatus(val OptOrderStatus) {
 	s.Status = val
 }
 
-func (*OrderDto) getOrderByIdRes() {}
+func (*OrderDto) getOrderByIDRes() {}
 
 // Ref: #
 type OrderPayRequest struct {
@@ -540,7 +535,7 @@ func (s *OrderPayResponse) SetTransactionUUID(val uuid.UUID) {
 	s.TransactionUUID = val
 }
 
-func (*OrderPayResponse) aPIV1OrdersOrderUUIDPayPostRes() {}
+func (*OrderPayResponse) payOrderRes() {}
 
 // Ref: #
 type OrderStatus string
@@ -590,6 +585,11 @@ func (s *OrderStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
+
+// PayOrderUnprocessableEntity is response for PayOrder operation.
+type PayOrderUnprocessableEntity struct{}
+
+func (*PayOrderUnprocessableEntity) payOrderRes() {}
 
 // Ref: #
 type PaymentMethod string

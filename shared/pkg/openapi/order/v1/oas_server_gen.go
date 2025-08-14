@@ -8,30 +8,30 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// APIV1OrdersOrderUUIDCancelPost implements POST /api/v1/orders/{orderUUID}/cancel operation.
+	// CancelOrder implements CancelOrder operation.
 	//
 	// Cancel order.
 	//
 	// POST /api/v1/orders/{orderUUID}/cancel
-	APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (APIV1OrdersOrderUUIDCancelPostRes, error)
-	// APIV1OrdersOrderUUIDPayPost implements POST /api/v1/orders/{orderUUID}/pay operation.
-	//
-	// Оплата заказа.
-	//
-	// POST /api/v1/orders/{orderUUID}/pay
-	APIV1OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (APIV1OrdersOrderUUIDPayPostRes, error)
-	// APIV1OrdersPost implements POST /api/v1/orders operation.
+	CancelOrder(ctx context.Context, params CancelOrderParams) (CancelOrderRes, error)
+	// CreateOrder implements CreateOrder operation.
 	//
 	// Создание заказа.
 	//
 	// POST /api/v1/orders
-	APIV1OrdersPost(ctx context.Context, req *OrderCreateRequest) (APIV1OrdersPostRes, error)
-	// GetOrderById implements GetOrderById operation.
+	CreateOrder(ctx context.Context, req *OrderCreateRequest) (CreateOrderRes, error)
+	// GetOrderByID implements GetOrderByID operation.
 	//
 	// Получение заказа по идентификатору.
 	//
 	// GET /api/v1/orders/{orderUUID}
-	GetOrderById(ctx context.Context, params GetOrderByIdParams) (GetOrderByIdRes, error)
+	GetOrderByID(ctx context.Context, params GetOrderByIDParams) (GetOrderByIDRes, error)
+	// PayOrder implements PayOrder operation.
+	//
+	// Оплата заказа.
+	//
+	// POST /api/v1/orders/{orderUUID}/pay
+	PayOrder(ctx context.Context, req *OrderPayRequest, params PayOrderParams) (PayOrderRes, error)
 	// NewError creates *GenericErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

@@ -53,10 +53,10 @@ type OrderHandler struct {
 	payClient paymentv1.PaymentServiceClient
 }
 
-func (o *OrderHandler) GetOrderById(
+func (o *OrderHandler) GetOrderByID(
 	ctx context.Context,
-	params orderv1.GetOrderByIdParams,
-) (orderv1.GetOrderByIdRes, error) {
+	params orderv1.GetOrderByIDParams,
+) (orderv1.GetOrderByIDRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
 		return &orderv1.NotFoundError{
@@ -68,10 +68,10 @@ func (o *OrderHandler) GetOrderById(
 	return order, nil
 }
 
-func (o *OrderHandler) APIV1OrdersOrderUUIDCancelPost(
+func (o *OrderHandler) CancelOrder(
 	ctx context.Context,
-	params orderv1.APIV1OrdersOrderUUIDCancelPostParams,
-) (orderv1.APIV1OrdersOrderUUIDCancelPostRes, error) {
+	params orderv1.CancelOrderParams,
+) (orderv1.CancelOrderRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
 		return &orderv1.NotFoundError{
@@ -79,24 +79,27 @@ func (o *OrderHandler) APIV1OrdersOrderUUIDCancelPost(
 			Message: "Order was not found.",
 		}, nil
 	}
-	if order.Status.Value != orderv1.OrderStatusPENDINGPAYMENT {
+	if order.Status.Value == orderv1.OrderStatusCANCELLED {
 		return &orderv1.ConflictError{
 			Code:    409,
-			Message: "Заказ не может быть отменен",
+			Message: "Заказ уже отменен",
+		}, nil
+	}
+	if order.Status.Value == orderv1.OrderStatusPAID {
+		return &orderv1.ConflictError{
+			Code:    409,
+			Message: "Заказ уже оплачен и не может быть отменен",
 		}, nil
 	}
 	(&order.Status).SetTo(orderv1.OrderStatusCANCELLED)
-
-	return (orderv1.APIV1OrdersOrderUUIDCancelPostRes)(
-		nil,
-	), nil
+	return (orderv1.CancelOrderRes)(nil), nil
 }
 
-func (o *OrderHandler) APIV1OrdersOrderUUIDPayPost(
+func (o *OrderHandler) PayOrder(
 	ctx context.Context,
 	req *orderv1.OrderPayRequest,
-	params orderv1.APIV1OrdersOrderUUIDPayPostParams,
-) (orderv1.APIV1OrdersOrderUUIDPayPostRes, error) {
+	params orderv1.PayOrderParams,
+) (orderv1.PayOrderRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
 		return &orderv1.NotFoundError{
@@ -137,10 +140,10 @@ func (o *OrderHandler) APIV1OrdersOrderUUIDPayPost(
 	}, nil
 }
 
-func (o *OrderHandler) APIV1OrdersPost(
+func (o *OrderHandler) CreateOrder(
 	ctx context.Context,
 	req *orderv1.OrderCreateRequest,
-) (orderv1.APIV1OrdersPostRes, error) {
+) (orderv1.CreateOrderRes, error) {
 	o.storage.mu.RLock()
 	defer func() {
 		o.storage.mu.RUnlock()
@@ -213,7 +216,7 @@ func (o *OrderHandler) APIV1OrdersPost(
 	}, nil
 }
 
-func (h *OrderHandler) NewError(
+func (o *OrderHandler) NewError(
 	_ context.Context,
 	err error,
 ) *orderv1.GenericErrorStatusCode {

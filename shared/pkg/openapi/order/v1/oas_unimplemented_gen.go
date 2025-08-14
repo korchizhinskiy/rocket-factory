@@ -13,39 +13,39 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// APIV1OrdersOrderUUIDCancelPost implements POST /api/v1/orders/{orderUUID}/cancel operation.
+// CancelOrder implements CancelOrder operation.
 //
 // Cancel order.
 //
 // POST /api/v1/orders/{orderUUID}/cancel
-func (UnimplementedHandler) APIV1OrdersOrderUUIDCancelPost(ctx context.Context, params APIV1OrdersOrderUUIDCancelPostParams) (r APIV1OrdersOrderUUIDCancelPostRes, _ error) {
+func (UnimplementedHandler) CancelOrder(ctx context.Context, params CancelOrderParams) (r CancelOrderRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// APIV1OrdersOrderUUIDPayPost implements POST /api/v1/orders/{orderUUID}/pay operation.
-//
-// Оплата заказа.
-//
-// POST /api/v1/orders/{orderUUID}/pay
-func (UnimplementedHandler) APIV1OrdersOrderUUIDPayPost(ctx context.Context, req *OrderPayRequest, params APIV1OrdersOrderUUIDPayPostParams) (r APIV1OrdersOrderUUIDPayPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// APIV1OrdersPost implements POST /api/v1/orders operation.
+// CreateOrder implements CreateOrder operation.
 //
 // Создание заказа.
 //
 // POST /api/v1/orders
-func (UnimplementedHandler) APIV1OrdersPost(ctx context.Context, req *OrderCreateRequest) (r APIV1OrdersPostRes, _ error) {
+func (UnimplementedHandler) CreateOrder(ctx context.Context, req *OrderCreateRequest) (r CreateOrderRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// GetOrderById implements GetOrderById operation.
+// GetOrderByID implements GetOrderByID operation.
 //
 // Получение заказа по идентификатору.
 //
 // GET /api/v1/orders/{orderUUID}
-func (UnimplementedHandler) GetOrderById(ctx context.Context, params GetOrderByIdParams) (r GetOrderByIdRes, _ error) {
+func (UnimplementedHandler) GetOrderByID(ctx context.Context, params GetOrderByIDParams) (r GetOrderByIDRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PayOrder implements PayOrder operation.
+//
+// Оплата заказа.
+//
+// POST /api/v1/orders/{orderUUID}/pay
+func (UnimplementedHandler) PayOrder(ctx context.Context, req *OrderPayRequest, params PayOrderParams) (r PayOrderRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
