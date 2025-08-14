@@ -23,7 +23,6 @@ func generateParts() map[string]*inventoryv1.Part {
 		"Control Module",
 		"Stabilizer",
 	}
-
 	descriptions := []string{
 		"Primary propulsion unit",
 		"Backup propulsion unit",
@@ -42,17 +41,21 @@ func generateParts() map[string]*inventoryv1.Part {
 		idx := gofakeit.Number(0, len(names)-1)
 		genUUID := uuid.NewString()
 		parts[genUUID] = &inventoryv1.Part{
-			Uuid:          genUUID,
-			Name:          names[idx],
-			Description:   descriptions[idx],
-			Price:         roundTo(gofakeit.Float64Range(100, 10_000)),
+			Uuid:        genUUID,
+			Name:        names[idx],
+			Description: descriptions[idx],
+			Price: roundTo(
+				gofakeit.Float64Range(100, 10_000),
+			),
 			StockQuantity: int64(gofakeit.Number(1, 100)),
-			Category:      inventoryv1.PartCategory(gofakeit.Number(1, 4)), // nolint: gosec
-			Dimensions:    generateDimensions(),
-			Manufacturer:  generateManufacturer(),
-			Tags:          generateTags(),
-			Metadata:      generateMetadata(),
-			CreatedAt:     timestamppb.Now(),
+			Category: inventoryv1.PartCategory(
+				gofakeit.Number(1, 4),
+			), // nolint: gosec
+			Dimensions:   generateDimensions(),
+			Manufacturer: generateManufacturer(),
+			Tags:         generateTags(),
+			Metadata:     generateMetadata(),
+			CreatedAt:    timestamppb.Now(),
 		}
 	}
 	return parts
@@ -77,20 +80,17 @@ func generateManufacturer() *inventoryv1.Manufacturer {
 
 func generateTags() []string {
 	var tags []string
-	for i := 0; i < gofakeit.Number(1, 10); i++ {
+	for range gofakeit.Number(1, 10) {
 		tags = append(tags, gofakeit.EmojiTag())
 	}
-
 	return tags
 }
 
 func generateMetadata() map[string]*inventoryv1.MetadataValue {
 	metadata := make(map[string]*inventoryv1.MetadataValue)
-
-	for i := 0; i < gofakeit.Number(1, 10); i++ {
+	for range gofakeit.Number(1, 10) {
 		metadata[gofakeit.Word()] = generateMetadataValue()
 	}
-
 	return metadata
 }
 
@@ -113,7 +113,9 @@ func generateMetadataValue() *inventoryv1.MetadataValue {
 	case 2:
 		return &inventoryv1.MetadataValue{
 			Type: &inventoryv1.MetadataValue_DoubleValue{
-				DoubleValue: roundTo(gofakeit.Float64Range(1, 100)),
+				DoubleValue: roundTo(
+					gofakeit.Float64Range(1, 100),
+				),
 			},
 		}
 

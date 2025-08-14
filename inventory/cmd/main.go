@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"maps"
 	"net"
 	"os"
 	"os/signal"
@@ -37,7 +38,10 @@ func (inv *inventoryService) GetPart(
 	part, ok := inv.parts[request.Uuid]
 
 	if !ok {
-		return nil, status.Error(codes.NotFound, "part not found")
+		return nil, status.Error(
+			codes.NotFound,
+			"part not found",
+		)
 	}
 	return &inventoryv1.GetPartResponse{Part: part}, nil
 }
@@ -55,52 +59,76 @@ func (inv *inventoryService) ListPart(
 	categoryFilter := partCategoryFilter{}
 	manufacturerCountriesFilter := partManufacturerCountriesFilter{}
 
-	var partSlice []*inventoryv1.Part
-	partsMap := inv.parts
+	parts := inv.parts
 
 	if filter := request.GetFilter(); filter != nil {
-		partsMap = uuidFilter.filter(partsMap, request.GetFilter().Uuids)
-		partsMap = tagFilter.filter(partsMap, request.GetFilter().Tags)
-		partsMap = nameFilter.filter(partsMap, request.GetFilter().Names)
-		partsMap = categoryFilter.filter(partsMap, request.GetFilter().Categories)
-		partsMap = manufacturerCountriesFilter.filter(partsMap, request.GetFilter().ManufactorerCountries)
+		parts = uuidFilter.filter(
+			parts,
+			request.GetFilter().Uuids,
+		)
+		parts = tagFilter.filter(
+			parts,
+			request.GetFilter().Tags,
+		)
+		parts = nameFilter.filter(
+			parts,
+			request.GetFilter().Names,
+		)
+		parts = categoryFilter.filter(
+			parts,
+			request.GetFilter().Categories,
+		)
+		parts = manufacturerCountriesFilter.filter(
+			parts,
+			request.GetFilter().ManufactorerCountries,
+		)
 
 	}
-
-	partSlice = make([]*inventoryv1.Part, len(partsMap))
-	idx := 0
-
-	for _, v := range partsMap {
-		partSlice[idx] = v
-		idx++
-	}
-
-	return &inventoryv1.ListPartResponse{Parts: partSlice}, nil
+	var partList []*inventoryv1.Part
+	maps.Values(parts)(func(p *inventoryv1.Part) bool {
+		partList = append(partList, p)
+		return true
+	})
+	return &inventoryv1.ListPartResponse{Parts: partList}, nil
 }
 
 func main() {
 	logger := GetLogger()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	lis, err := net.Listen(
+		"tcp",
+		fmt.Sprintf(":%d", grpcPort),
+	)
 	if err != nil {
-		logger.Info("Failed to listen", slog.Any("error", err))
+		logger.Info(
+			"Failed to listen",
+			slog.Any("error", err),
+		)
 		return
 	}
 
 	defer func() {
 		if err := lis.Close(); err != nil {
-			logger.Info("Failed to close listener", slog.Any("error", err))
+			logger.Info(
+				"Failed to close listener",
+				slog.Any("error", err),
+			)
 		}
 	}()
 
 	validator, err := protovalidate.New()
 	if err != nil {
-		logger.Info("Failed to create Validators", slog.Any("error", err))
+		logger.Info(
+			"Failed to create Validators",
+			slog.Any("error", err),
+		)
 		return
 	}
 
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			protovalidate_middleware.UnaryServerInterceptor(validator),
+			protovalidate_middleware.UnaryServerInterceptor(
+				validator,
+			),
 			logging_middleware.UnaryServerInterceptor(
 				InterceptorLogger(logger),
 				[]logging_middleware.Option{
@@ -114,13 +142,22 @@ func main() {
 
 	reflection.Register(server)
 	service := &inventoryService{parts: generateParts()}
-	inventoryv1.RegisterInventoryServiceServer(server, service)
+	inventoryv1.RegisterInventoryServiceServer(
+		server,
+		service,
+	)
 
 	go func() {
-		logger.Info("gRPC server listening", slog.Any("port", grpcPort))
+		logger.Info(
+			"gRPC server listening",
+			slog.Any("port", grpcPort),
+		)
 		err := server.Serve(lis)
 		if err != nil {
-			logger.Info("Failed to serve", slog.Any("error", err))
+			logger.Info(
+				"Failed to serve",
+				slog.Any("error", err),
+			)
 			return
 		}
 	}()
@@ -135,14 +172,19 @@ func main() {
 }
 
 func GetLogger() *slog.Logger {
-	return slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-		Level: slog.LevelDebug,
-	}))
+	return slog.New(
+		slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		}),
+	)
 }
 
-func InterceptorLogger(l *slog.Logger) logging_middleware.Logger {
+func InterceptorLogger(
+	l *slog.Logger,
+) logging_middleware.Logger {
 	return logging_middleware.LoggerFunc(
 		func(ctx context.Context, lvl logging_middleware.Level, msg string, fields ...any) {
 			l.Log(ctx, slog.Level(lvl), msg, fields...)
-		})
+		},
+	)
 }

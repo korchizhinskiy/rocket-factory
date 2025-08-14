@@ -59,7 +59,10 @@ func (o *OrderHandler) GetOrderById(
 ) (orderv1.GetOrderByIdRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
-		return &orderv1.NotFoundError{Code: 404, Message: "Order was not found."}, nil
+		return &orderv1.NotFoundError{
+			Code:    404,
+			Message: "Order was not found.",
+		}, nil
 	}
 
 	return order, nil
@@ -71,14 +74,22 @@ func (o *OrderHandler) APIV1OrdersOrderUUIDCancelPost(
 ) (orderv1.APIV1OrdersOrderUUIDCancelPostRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
-		return &orderv1.NotFoundError{Code: 404, Message: "Order was not found."}, nil
+		return &orderv1.NotFoundError{
+			Code:    404,
+			Message: "Order was not found.",
+		}, nil
 	}
 	if order.Status.Value != orderv1.OrderStatusPENDINGPAYMENT {
-		return &orderv1.ConflictError{Code: 409, Message: "Заказ не может быть отменен"}, nil
+		return &orderv1.ConflictError{
+			Code:    409,
+			Message: "Заказ не может быть отменен",
+		}, nil
 	}
 	(&order.Status).SetTo(orderv1.OrderStatusCANCELLED)
 
-	return (orderv1.APIV1OrdersOrderUUIDCancelPostRes)(nil), nil
+	return (orderv1.APIV1OrdersOrderUUIDCancelPostRes)(
+		nil,
+	), nil
 }
 
 func (o *OrderHandler) APIV1OrdersOrderUUIDPayPost(
@@ -88,26 +99,42 @@ func (o *OrderHandler) APIV1OrdersOrderUUIDPayPost(
 ) (orderv1.APIV1OrdersOrderUUIDPayPostRes, error) {
 	order, ok := o.storage.orders[params.OrderUUID.String()]
 	if !ok {
-		return &orderv1.NotFoundError{Code: 404, Message: "Order was not found."}, nil
+		return &orderv1.NotFoundError{
+			Code:    404,
+			Message: "Order was not found.",
+		}, nil
 	}
 
-	resp, err := o.payClient.PayOrder(ctx, &paymentv1.PayOrderRequest{
-		OrderUuid:     params.OrderUUID.String(),
-		UserUuid:      req.UserUUID.String(),
-		PaymentMethod: ConvertPaymentMethodStrToProto(req.PaymentMethod),
-	})
+	resp, err := o.payClient.PayOrder(
+		ctx,
+		&paymentv1.PayOrderRequest{
+			OrderUuid: params.OrderUUID.String(),
+			UserUuid:  req.UserUUID.String(),
+			PaymentMethod: ConvertPaymentMethodStrToProto(
+				req.PaymentMethod,
+			),
+		},
+	)
 	if err != nil {
-		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+		return &orderv1.InternalError{
+			Code:    500,
+			Message: "Internal Error",
+		}, nil
 	}
 
 	transactionUUID, err := uuid.Parse(resp.TransactionUuid)
 	if err != nil {
-		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+		return &orderv1.InternalError{
+			Code:    500,
+			Message: "Internal Error",
+		}, nil
 	}
 	(&order.Status).SetTo(orderv1.OrderStatusPAID)
 	(&order.PatmentMethod).SetTo(req.PaymentMethod)
 
-	return &orderv1.OrderPayResponse{TransactionUUID: transactionUUID}, nil
+	return &orderv1.OrderPayResponse{
+		TransactionUUID: transactionUUID,
+	}, nil
 }
 
 func (o *OrderHandler) APIV1OrdersPost(
@@ -122,11 +149,15 @@ func (o *OrderHandler) APIV1OrdersPost(
 	resp, err := o.invClient.ListPart(
 		ctx,
 		&inventoryv1.ListPartRequest{
-			Filter: &inventoryv1.PartsFilter{Uuids: slices.Collect(func(yield func(string) bool) {
-				for _, u := range req.PartUuids {
-					yield(u.String())
-				}
-			})},
+			Filter: &inventoryv1.PartsFilter{
+				Uuids: slices.Collect(
+					func(yield func(string) bool) {
+						for _, u := range req.PartUuids {
+							yield(u.String())
+						}
+					},
+				),
+			},
 		},
 	)
 	if err != nil {
@@ -144,20 +175,30 @@ func (o *OrderHandler) APIV1OrdersPost(
 	}
 	orderUUID, err := uuid.NewUUID()
 	if err != nil {
-		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+		return &orderv1.InternalError{
+			Code:    500,
+			Message: "Internal Error",
+		}, nil
 	}
 	transactionUUID, err := uuid.NewUUID()
 	if err != nil {
-		return &orderv1.InternalError{Code: 500, Message: "Internal Error"}, nil
+		return &orderv1.InternalError{
+			Code:    500,
+			Message: "Internal Error",
+		}, nil
 	}
 	order := orderv1.OrderDto{
-		OrderUUID:       orderv1.NewOptUUID(orderUUID),
-		UserUUID:        orderv1.NewOptUUID(req.UserUUID),
-		PartUuids:       req.PartUuids,
-		TotalPrice:      orderv1.NewOptFloat64(1000),
-		TransactionUUID: orderv1.NewOptUUID(transactionUUID),
-		PatmentMethod:   orderv1.OptPaymentMethod{},
-		Status:          orderv1.NewOptOrderStatus(orderv1.OrderStatusPENDINGPAYMENT),
+		OrderUUID:  orderv1.NewOptUUID(orderUUID),
+		UserUUID:   orderv1.NewOptUUID(req.UserUUID),
+		PartUuids:  req.PartUuids,
+		TotalPrice: orderv1.NewOptFloat64(1000),
+		TransactionUUID: orderv1.NewOptUUID(
+			transactionUUID,
+		),
+		PatmentMethod: orderv1.OptPaymentMethod{},
+		Status: orderv1.NewOptOrderStatus(
+			orderv1.OrderStatusPENDINGPAYMENT,
+		),
 	}
 
 	var totalPrice float64
@@ -172,7 +213,10 @@ func (o *OrderHandler) APIV1OrdersPost(
 	}, nil
 }
 
-func (h *OrderHandler) NewError(_ context.Context, err error) *orderv1.GenericErrorStatusCode {
+func (h *OrderHandler) NewError(
+	_ context.Context,
+	err error,
+) *orderv1.GenericErrorStatusCode {
 	return &orderv1.GenericErrorStatusCode{
 		StatusCode: http.StatusInternalServerError,
 		Response: orderv1.GenericError{
@@ -200,9 +244,20 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(10 * time.Second))
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedMethods: []string{
+			"GET",
+			"POST",
+			"PUT",
+			"DELETE",
+			"OPTIONS",
+		},
+		AllowedHeaders: []string{
+			"Accept",
+			"Authorization",
+			"Content-Type",
+			"X-CSRF-Token",
+		},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -211,7 +266,9 @@ func main() {
 
 	invConn, err := grpc.NewClient(
 		net.JoinHostPort("localhost", "50052"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(
+			insecure.NewCredentials(),
+		),
 	)
 	if err != nil {
 		log.Printf("Ошибка подключения к сервису Inventory")
@@ -219,22 +276,33 @@ func main() {
 	}
 	payConn, err := grpc.NewClient(
 		net.JoinHostPort("localhost", "50051"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(
+			insecure.NewCredentials(),
+		),
 	)
 	if err != nil {
 		log.Printf("Ошибка подключения к сервису Payment")
 		return
 	}
-	invClient := inventoryv1.NewInventoryServiceClient(invConn)
+	invClient := inventoryv1.NewInventoryServiceClient(
+		invConn,
+	)
 	payClient := paymentv1.NewPaymentServiceClient(payConn)
 	storage := NewOrderStorage()
-	orderHandler := NewOrderHandler(storage, invClient, payClient)
+	orderHandler := NewOrderHandler(
+		storage,
+		invClient,
+		payClient,
+	)
 	orderServer, err := orderv1.NewServer(orderHandler)
 	if err != nil {
 		log.Fatalf("Ошибка создания сервера")
 	}
 	r.Mount("/", orderServer)
-	r.Handle("/docs/*", http.StripPrefix("/docs/", fileServer))
+	r.Handle(
+		"/docs/*",
+		http.StripPrefix("/docs/", fileServer),
+	)
 	r.Get("/docs/swagger", SwaggerUIHandler(
 		"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
 		"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
@@ -244,14 +312,24 @@ func main() {
 	))
 
 	srv := &http.Server{
-		Addr:              net.JoinHostPort("localhost", httpPort),
+		Addr: net.JoinHostPort(
+			"localhost",
+			httpPort,
+		),
 		Handler:           r,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
 	go func() {
-		log.Printf("🚀 HTTP-сервер запущен на http://localhost:%s\n", httpPort)
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("❌ Ошибка запуска сервера: %v\n", err)
+		log.Printf(
+			"🚀 HTTP-сервер запущен на http://localhost:%s\n",
+			httpPort,
+		)
+		if err := srv.ListenAndServe(); err != nil &&
+			!errors.Is(err, http.ErrServerClosed) {
+			log.Printf(
+				"❌ Ошибка запуска сервера: %v\n",
+				err,
+			)
 		}
 	}()
 
@@ -260,10 +338,16 @@ func main() {
 	<-quit
 	log.Println("🛑 Завершение работы сервера...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		shutdownTimeout,
+	)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Printf("❌ Ошибка при остановке сервера: %v\n", err)
+		log.Printf(
+			"❌ Ошибка при остановке сервера: %v\n",
+			err,
+		)
 	} else {
 		log.Println("✅ Сервер остановлен")
 	}

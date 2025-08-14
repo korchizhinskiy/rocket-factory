@@ -6,9 +6,7 @@ import (
 	"net/http"
 )
 
-func SwaggerUIHandler(
-	swaggerCSSURL, swaggerJSURL, swaggerFaviconURL, title, openapiURL string,
-) http.HandlerFunc {
+func SwaggerUIHandler(swaggerCSSURL, swaggerJSURL, swaggerFaviconURL, title, openapiURL string) http.HandlerFunc {
 	const htmlTemplate = `
 <!DOCTYPE html>
 <html>
@@ -39,7 +37,12 @@ func SwaggerUIHandler(
 
 	tmpl, err := template.New("swagger").Parse(htmlTemplate)
 	if err != nil {
-		panic(fmt.Sprintf("Ошибка шаблона SwaggerUI: %v", err))
+		panic(
+			fmt.Sprintf(
+				"Ошибка шаблона SwaggerUI: %v",
+				err,
+			),
+		)
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -51,9 +54,14 @@ func SwaggerUIHandler(
 			"OpenAPI": openapiURL,
 		}
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().
+			Set("Content-Type", "text/html; charset=utf-8")
 		if err := tmpl.Execute(w, data); err != nil {
-			http.Error(w, "Ошибка рендеринга шаблона", http.StatusInternalServerError)
+			http.Error(
+				w,
+				"Ошибка рендеринга шаблона",
+				http.StatusInternalServerError,
+			)
 		}
 	}
 }

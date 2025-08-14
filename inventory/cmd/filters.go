@@ -8,22 +8,19 @@ import (
 
 type partUUIDFilter struct{}
 
-func (f partUUIDFilter) filter(
-	parts map[string]*inventoryv1.Part,
-	values []string,
-) map[string]*inventoryv1.Part {
+func (f partUUIDFilter) filter(parts map[string]*inventoryv1.Part, values []string) map[string]*inventoryv1.Part {
 	if len(values) == 0 {
 		return parts
 	}
 
-	filteredMap := make(map[string]*inventoryv1.Part, 0)
+	filteredParts := make(map[string]*inventoryv1.Part, 0)
 	for _, filterUUID := range values {
 		part, ok := parts[filterUUID]
 		if ok {
-			filteredMap[filterUUID] = part
+			filteredParts[filterUUID] = part
 		}
 	}
-	return filteredMap
+	return filteredParts
 }
 
 type partTagFilter struct{}
@@ -36,16 +33,17 @@ func (f partTagFilter) filter(
 		return parts
 	}
 
-	filteredMap := make(map[string]*inventoryv1.Part, 0)
+	filteredParts := make(map[string]*inventoryv1.Part, 0)
 
 	for _, filterTag := range values {
 		for partUUID, part := range parts {
-			if _, ok := filteredMap[partUUID]; !ok && slices.Contains(part.Tags, filterTag) {
-				filteredMap[partUUID] = part
+			if _, ok := filteredParts[partUUID]; !ok &&
+				slices.Contains(part.Tags, filterTag) {
+				filteredParts[partUUID] = part
 			}
 		}
 	}
-	return filteredMap
+	return filteredParts
 }
 
 type partNameFilter struct{}
@@ -62,7 +60,8 @@ func (f partNameFilter) filter(
 
 	for _, filterName := range values {
 		for partUUID, part := range parts {
-			if _, ok := filteredMap[partUUID]; !ok && part.Name == filterName {
+			if _, ok := filteredMap[partUUID]; !ok &&
+				part.Name == filterName {
 				filteredMap[partUUID] = part
 			}
 		}
@@ -84,7 +83,8 @@ func (f partCategoryFilter) filter(
 
 	for _, filterCategory := range values {
 		for partUUID, part := range parts {
-			if _, ok := filteredMap[partUUID]; !ok && part.Category == filterCategory {
+			if _, ok := filteredMap[partUUID]; !ok &&
+				part.Category == filterCategory {
 				filteredMap[partUUID] = part
 			}
 		}
