@@ -170,7 +170,6 @@ func (o *OrderHandler) CreateOrder(
 			TotalPrice: 1000,
 		}, nil
 	}
-	// TODO: Сделать проверку на вхождение всех элементов
 	if !utils.ContainsAll(slices.Collect(
 		func(yield func(string) bool) {
 			for _, part := range resp.Parts {
