@@ -48,14 +48,12 @@ func generateParts() map[string]*inventoryv1.Part {
 				gofakeit.Float64Range(100, 10_000),
 			),
 			StockQuantity: int64(gofakeit.Number(1, 100)),
-			Category: inventoryv1.PartCategory(
-				gofakeit.Number(1, 4),
-			), // nolint: gosec
-			Dimensions:   generateDimensions(),
-			Manufacturer: generateManufacturer(),
-			Tags:         generateTags(),
-			Metadata:     generateMetadata(),
-			CreatedAt:    timestamppb.Now(),
+			Category:      inventoryv1.PartCategory(gofakeit.Number(1, 4)), // nolint: gosec
+			Dimensions:    generateDimensions(),
+			Manufacturer:  generateManufacturer(),
+			Tags:          generateTags(),
+			Metadata:      generateMetadata(),
+			CreatedAt:     timestamppb.Now(),
 		}
 	}
 	return parts
