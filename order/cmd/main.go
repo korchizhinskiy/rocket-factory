@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	utils "github.com/korchizhinskiy/rocket-factory/order/internal/utils"
 	orderv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/openapi/order/v1"
 	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
 	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
@@ -170,7 +171,21 @@ func (o *OrderHandler) CreateOrder(
 		}, nil
 	}
 	// TODO: Сделать проверку на вхождение всех элементов
-	if len(resp.Parts) != len(req.PartUuids) {
+	if !utils.ContainsAll(slices.Collect(
+		func(yield func(string) bool) {
+			for _, part := range resp.Parts {
+				yield(part.Uuid)
+			}
+		},
+	),
+		slices.Collect(
+			func(yield func(string) bool) {
+				for _, part := range req.PartUuids {
+					yield(part.String())
+				}
+			},
+		),
+	) {
 		return &orderv1.NotFoundError{
 			Code:    404,
 			Message: "Some of part was not fount in inventory",
@@ -266,7 +281,6 @@ func main() {
 		MaxAge:           300,
 	}))
 	fileServer := http.FileServer(http.Dir("shared/api"))
-
 	invConn, err := grpc.NewClient(
 		net.JoinHostPort("localhost", "50052"),
 		grpc.WithTransportCredentials(
@@ -277,6 +291,7 @@ func main() {
 		log.Printf("Ошибка подключения к сервису Inventory")
 		return
 	}
+
 	payConn, err := grpc.NewClient(
 		net.JoinHostPort("localhost", "50051"),
 		grpc.WithTransportCredentials(
@@ -287,6 +302,7 @@ func main() {
 		log.Printf("Ошибка подключения к сервису Payment")
 		return
 	}
+
 	invClient := inventoryv1.NewInventoryServiceClient(
 		invConn,
 	)
@@ -301,6 +317,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка создания сервера")
 	}
+
 	r.Mount("/", orderServer)
 	r.Handle(
 		"/docs/*",

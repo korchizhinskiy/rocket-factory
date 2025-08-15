@@ -106,15 +106,6 @@ func main() {
 		return
 	}
 
-	defer func() {
-		if err := lis.Close(); err != nil {
-			logger.Info(
-				"Failed to close listener",
-				slog.Any("error", err),
-			)
-		}
-	}()
-
 	validator, err := protovalidate.New()
 	if err != nil {
 		logger.Info(
