@@ -1,0 +1,11 @@
+---
+title: OrderStatus
+type: string
+enum:
+  - PENDING_PAYMENT
+  - PAID
+  - CANCELLED
+x-enum-descriptions:
+  PENDING_PAYMENT: Ожидается оплата
+  PAID: Оплачено
+  CANCELLED: Отменен

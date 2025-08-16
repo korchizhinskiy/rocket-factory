@@ -1,0 +1,17 @@
+version: v2
+
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/bufbuild/protovalidate
+
+modules:
+  - path: shared/proto
+    lint:
+      use:
+        - STANDARD
+        - COMMENT_ENUM
+        - COMMENT_MESSAGE
+      except:
+        - RPC_RESPONSE_STANDARD_NAME
+        - RPC_REQUEST_RESPONSE_UNIQUE
+

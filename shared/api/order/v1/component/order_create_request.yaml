@@ -1,0 +1,15 @@
+---
+title: CreateOrderRequest
+type: object
+required:
+  - user_uuid
+  - part_uuids
+properties:
+  user_uuid:
+    type: string
+    format: uuid
+  part_uuids:
+    type: array
+    items:
+      type: string
+      format: uuid

@@ -1,0 +1,9 @@
+---
+title: PayOrderResponse
+type: object
+required:
+  - transaction_uuid
+properties:
+  transaction_uuid:
+    type: string
+    format: uuid

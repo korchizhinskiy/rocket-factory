@@ -1,0 +1,37 @@
+---
+get:
+  summary: Получение заказа по идентификатору
+  operationId: GetOrderByID
+  tags:
+    - Order
+  parameters:
+    - name: orderUUID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: "../component/order_get_response.yaml"
+    "404":
+      description: Заказ не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../component/error/not_found_error.yaml"
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/internal_error.yaml
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../component/error/generic_error.yaml"

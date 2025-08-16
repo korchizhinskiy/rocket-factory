@@ -1,0 +1,13 @@
+---
+title: PaymentMethod
+type: string
+enum:
+  - CARD
+  - SBP
+  - CREDIT_CARD
+  - INVESTOR_MONEY
+x-enum-descriptions:
+  CARD: Банковская карта
+  SBP: Система быстрых платежей
+  CREDIT_CARD: Кредитная карта
+  INVESTOR_MONEY: Средства инвестора

@@ -1,0 +1,44 @@
+---
+post:
+  summary: Создание заказа
+  operationId: CreateOrder
+  tags:
+    - Order
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../component/order_create_request.yaml"
+  responses:
+    "200":
+      description: Успешное создание заказа
+      content:
+        application/json:
+          schema:
+            $ref: "../component/order_create_response.yaml"
+      links:
+        GetOrderById:
+          operationId: GetOrderById
+          parameters:
+            orderUUID: "$response.body#/order_uuid"
+    "404":
+      description: Неверный запрос
+      content:
+        application/json:
+          schema:
+            $ref: "../component/error/not_found_error.yaml"
+    "422":
+      description: Ошибка валидации
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/internal_error.yaml
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../component/error/generic_error.yaml
