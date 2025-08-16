@@ -133,6 +133,7 @@ func (o *OrderHandler) PayOrder(
 			Message: "Internal Error",
 		}, nil
 	}
+
 	(&order.Status).SetTo(orderv1.OrderStatusPAID)
 	(&order.PatmentMethod).SetTo(req.PaymentMethod)
 
@@ -170,6 +171,7 @@ func (o *OrderHandler) CreateOrder(
 			TotalPrice: 1000,
 		}, nil
 	}
+
 	if !utils.ContainsAll(slices.Collect(
 		func(yield func(string) bool) {
 			for _, part := range resp.Parts {
@@ -190,6 +192,7 @@ func (o *OrderHandler) CreateOrder(
 			Message: "Some of part was not fount in inventory",
 		}, nil
 	}
+
 	orderUUID, err := uuid.NewUUID()
 	if err != nil {
 		return &orderv1.InternalError{
@@ -197,6 +200,7 @@ func (o *OrderHandler) CreateOrder(
 			Message: "Internal Error",
 		}, nil
 	}
+
 	transactionUUID, err := uuid.NewUUID()
 	if err != nil {
 		return &orderv1.InternalError{
@@ -204,6 +208,7 @@ func (o *OrderHandler) CreateOrder(
 			Message: "Internal Error",
 		}, nil
 	}
+
 	order := orderv1.OrderDto{
 		OrderUUID:  orderv1.NewOptUUID(orderUUID),
 		UserUUID:   orderv1.NewOptUUID(req.UserUUID),
@@ -217,13 +222,13 @@ func (o *OrderHandler) CreateOrder(
 			orderv1.OrderStatusPENDINGPAYMENT,
 		),
 	}
+	o.storage.orders[orderUUID.String()] = &order
 
 	var totalPrice float64
 	for _, part := range resp.Parts {
 		totalPrice += part.Price
 	}
 
-	o.storage.orders[orderUUID.String()] = &order
 	return &orderv1.OrderCreateResponse{
 		OrderUUID:  order.OrderUUID.Value,
 		TotalPrice: totalPrice,

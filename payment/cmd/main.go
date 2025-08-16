@@ -15,7 +15,9 @@ import (
 	logging_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 
 	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
@@ -30,9 +32,24 @@ func (s *paymentService) PayOrder(
 	_ context.Context,
 	request *paymentv1.PayOrderRequest,
 ) (*paymentv1.PayOrderResponse, error) {
+	if !s.IsPaymentMethodValid(request) {
+		return nil, status.Error(codes.InvalidArgument, "Invalid Payment method")
+	}
 	return &paymentv1.PayOrderResponse{
 		TransactionUuid: uuid.NewString(),
 	}, nil
+}
+
+func (s *paymentService) IsPaymentMethodValid(request *paymentv1.PayOrderRequest) bool {
+	switch request.PaymentMethod {
+	case paymentv1.PaymentMethod_PAYMENT_METHOD_CARD,
+		paymentv1.PaymentMethod_PAYMENT_METHOD_SBP,
+		paymentv1.PaymentMethod_PAYMENT_METHOD_CREDIT_CARD,
+		paymentv1.PaymentMethod_PAYMENT_METHOD_INVESTOR_MONEY:
+		return true
+	default:
+		return false
+	}
 }
 
 func main() {
