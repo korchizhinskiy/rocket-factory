@@ -35,8 +35,8 @@ func generateParts() map[string]*inventoryv1.Part {
 		"Flight control module",
 		"Stabilization fin",
 	}
-	parts := make(map[string]*inventoryv1.Part, 0)
 
+	parts := make(map[string]*inventoryv1.Part, 0)
 	for i := 0; i < gofakeit.Number(1, 50); i++ {
 		idx := gofakeit.Number(0, len(names)-1)
 		genUUID := uuid.NewString()
