@@ -39,7 +39,6 @@ func (s *paymentService) PayOrder(
 		TransactionUuid: uuid.NewString(),
 	}, nil
 }
-
 func (s *paymentService) IsPaymentMethodValid(request *paymentv1.PayOrderRequest) bool {
 	switch request.PaymentMethod {
 	case paymentv1.PaymentMethod_PAYMENT_METHOD_CARD,
@@ -58,6 +57,7 @@ func main() {
 		"tcp",
 		fmt.Sprintf(":%d", grpcPort),
 	)
+	
 	if err != nil {
 		logger.Info(
 			"Failed to listen",
@@ -74,6 +74,7 @@ func main() {
 			)
 		}
 	}()
+
 	validator, err := protovalidate.New()
 	if err != nil {
 		logger.Info(
@@ -82,6 +83,7 @@ func main() {
 		)
 		return
 	}
+
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			protovalidate_middleware.UnaryServerInterceptor(
