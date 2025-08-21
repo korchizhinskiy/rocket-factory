@@ -5,20 +5,30 @@ import "github.com/google/uuid"
 type PaymentMethod byte
 
 const (
-	PAYMENT_METHOD_UNSPECIFIED = iota
-	PAYMENT_METHOD_CARD
-	PAYMENT_METHOD_SBP
-	PAYMENT_METHOD_CREDIT_CARD
-	PAYMENT_METHOD_INVESTOR_MONEY
+	PaymentMethodCard PaymentMethod = iota
+	PaymentMethodSBP
+	PaymentMethodCreditCard
+	PaymentMethodInvestorMoney
 )
 
-type Payment struct {
-	orderID       uuid.UUID
-	userID        uuid.UUID
-	paymentMethod PaymentMethod
+func (pm *PaymentMethod) String() string {
+	switch *pm {
+	case PaymentMethodCard:
+		return "Card"
+	case PaymentMethodSBP:
+		return "SBP"
+	case PaymentMethodCreditCard:
+		return "Credit Card"
+	case PaymentMethodInvestorMoney:
+		return "Investor Money"
+	default:
+		return "Unknown"
+	}
 }
-type PaymentTransaction struct {
-	ID uuid.UUID
-	PaymentID    uuid.UUID
-  PaymentMethod PaymentMethod
+
+type Payment struct {
+	OrderID       uuid.UUID
+	UserID        uuid.UUID
+	PaymentMethod *PaymentMethod
+	TransactionID *uuid.UUID
 }
