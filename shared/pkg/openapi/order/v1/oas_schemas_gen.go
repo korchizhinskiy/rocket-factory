@@ -413,22 +413,22 @@ func (*OrderCreateResponse) createOrderRes() {}
 
 // Ref: #
 type OrderDto struct {
-	OrderUUID       OptUUID          `json:"order_uuid"`
-	UserUUID        OptUUID          `json:"user_uuid"`
+	OrderUUID       uuid.UUID        `json:"order_uuid"`
+	UserUUID        uuid.UUID        `json:"user_uuid"`
 	PartUuids       []uuid.UUID      `json:"part_uuids"`
 	TotalPrice      OptFloat64       `json:"total_price"`
 	TransactionUUID OptUUID          `json:"transaction_uuid"`
-	PatmentMethod   OptPaymentMethod `json:"patment_method"`
+	PaymentMethod   OptPaymentMethod `json:"payment_method"`
 	Status          OptOrderStatus   `json:"status"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
-func (s *OrderDto) GetOrderUUID() OptUUID {
+func (s *OrderDto) GetOrderUUID() uuid.UUID {
 	return s.OrderUUID
 }
 
 // GetUserUUID returns the value of UserUUID.
-func (s *OrderDto) GetUserUUID() OptUUID {
+func (s *OrderDto) GetUserUUID() uuid.UUID {
 	return s.UserUUID
 }
 
@@ -447,9 +447,9 @@ func (s *OrderDto) GetTransactionUUID() OptUUID {
 	return s.TransactionUUID
 }
 
-// GetPatmentMethod returns the value of PatmentMethod.
-func (s *OrderDto) GetPatmentMethod() OptPaymentMethod {
-	return s.PatmentMethod
+// GetPaymentMethod returns the value of PaymentMethod.
+func (s *OrderDto) GetPaymentMethod() OptPaymentMethod {
+	return s.PaymentMethod
 }
 
 // GetStatus returns the value of Status.
@@ -458,12 +458,12 @@ func (s *OrderDto) GetStatus() OptOrderStatus {
 }
 
 // SetOrderUUID sets the value of OrderUUID.
-func (s *OrderDto) SetOrderUUID(val OptUUID) {
+func (s *OrderDto) SetOrderUUID(val uuid.UUID) {
 	s.OrderUUID = val
 }
 
 // SetUserUUID sets the value of UserUUID.
-func (s *OrderDto) SetUserUUID(val OptUUID) {
+func (s *OrderDto) SetUserUUID(val uuid.UUID) {
 	s.UserUUID = val
 }
 
@@ -482,9 +482,9 @@ func (s *OrderDto) SetTransactionUUID(val OptUUID) {
 	s.TransactionUUID = val
 }
 
-// SetPatmentMethod sets the value of PatmentMethod.
-func (s *OrderDto) SetPatmentMethod(val OptPaymentMethod) {
-	s.PatmentMethod = val
+// SetPaymentMethod sets the value of PaymentMethod.
+func (s *OrderDto) SetPaymentMethod(val OptPaymentMethod) {
+	s.PaymentMethod = val
 }
 
 // SetStatus sets the value of Status.

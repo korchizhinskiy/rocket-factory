@@ -1,6 +1,10 @@
 ---
 title: OrderDTO
 type: object
+required:
+  - order_uuid
+  - user_uuid
+  - part_uuids
 properties:
   order_uuid:
     type: string
@@ -19,7 +23,7 @@ properties:
   transaction_uuid:
     type: string
     format: uuid
-  patment_method:
+  payment_method:
     $ref: "../enum/payment_method.yaml"
   status:
     $ref: "../enum/order_status.yaml"

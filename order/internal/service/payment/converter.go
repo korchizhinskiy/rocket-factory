@@ -1,21 +1,21 @@
-package main
+package payment
 
 import (
-	orderv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/openapi/order/v1"
+	"github.com/korchizhinskiy/rocket-factory/order/internal/model"
 	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 func ConvertPaymentMethodStrToProto(
-	orderPaymentMethod orderv1.PaymentMethod,
+	orderPaymentMethod model.PaymentMethod,
 ) paymentv1.PaymentMethod {
 	switch orderPaymentMethod {
-	case orderv1.PaymentMethodCARD:
+	case model.PaymentMethodCARD:
 		return paymentv1.PaymentMethod_PAYMENT_METHOD_CARD
-	case orderv1.PaymentMethodSBP:
+	case model.PaymentMethodSBP:
 		return paymentv1.PaymentMethod_PAYMENT_METHOD_SBP
-	case orderv1.PaymentMethodCREDITCARD:
+	case model.PaymentMethodCREDITCARD:
 		return paymentv1.PaymentMethod_PAYMENT_METHOD_CREDIT_CARD
-	case orderv1.PaymentMethodINVESTORMONEY:
+	case model.PaymentMethodINVESTORMONEY:
 		return paymentv1.PaymentMethod_PAYMENT_METHOD_INVESTOR_MONEY
 	default:
 		return paymentv1.PaymentMethod_PAYMENT_METHOD_UNSPECIFIED

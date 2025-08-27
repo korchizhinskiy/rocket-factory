@@ -61,6 +61,17 @@ func (s *OrderDto) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
+		if s.PartUuids == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "part_uuids",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if value, ok := s.TotalPrice.Get(); ok {
 			if err := func() error {
 				if err := (validate.Float{}).Validate(float64(value)); err != nil {
@@ -79,7 +90,7 @@ func (s *OrderDto) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.PatmentMethod.Get(); ok {
+		if value, ok := s.PaymentMethod.Get(); ok {
 			if err := func() error {
 				if err := value.Validate(); err != nil {
 					return err
@@ -92,7 +103,7 @@ func (s *OrderDto) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "patment_method",
+			Name:  "payment_method",
 			Error: err,
 		})
 	}

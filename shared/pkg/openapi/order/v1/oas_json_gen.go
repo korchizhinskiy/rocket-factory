@@ -850,26 +850,20 @@ func (s *OrderDto) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *OrderDto) encodeFields(e *jx.Encoder) {
 	{
-		if s.OrderUUID.Set {
-			e.FieldStart("order_uuid")
-			s.OrderUUID.Encode(e)
-		}
+		e.FieldStart("order_uuid")
+		json.EncodeUUID(e, s.OrderUUID)
 	}
 	{
-		if s.UserUUID.Set {
-			e.FieldStart("user_uuid")
-			s.UserUUID.Encode(e)
-		}
+		e.FieldStart("user_uuid")
+		json.EncodeUUID(e, s.UserUUID)
 	}
 	{
-		if s.PartUuids != nil {
-			e.FieldStart("part_uuids")
-			e.ArrStart()
-			for _, elem := range s.PartUuids {
-				json.EncodeUUID(e, elem)
-			}
-			e.ArrEnd()
+		e.FieldStart("part_uuids")
+		e.ArrStart()
+		for _, elem := range s.PartUuids {
+			json.EncodeUUID(e, elem)
 		}
+		e.ArrEnd()
 	}
 	{
 		if s.TotalPrice.Set {
@@ -884,9 +878,9 @@ func (s *OrderDto) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.PatmentMethod.Set {
-			e.FieldStart("patment_method")
-			s.PatmentMethod.Encode(e)
+		if s.PaymentMethod.Set {
+			e.FieldStart("payment_method")
+			s.PaymentMethod.Encode(e)
 		}
 	}
 	{
@@ -903,7 +897,7 @@ var jsonFieldsNameOfOrderDto = [7]string{
 	2: "part_uuids",
 	3: "total_price",
 	4: "transaction_uuid",
-	5: "patment_method",
+	5: "payment_method",
 	6: "status",
 }
 
@@ -912,13 +906,16 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OrderDto to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "order_uuid":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.OrderUUID.Reset()
-				if err := s.OrderUUID.Decode(d); err != nil {
+				v, err := json.DecodeUUID(d)
+				s.OrderUUID = v
+				if err != nil {
 					return err
 				}
 				return nil
@@ -926,9 +923,11 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"order_uuid\"")
 			}
 		case "user_uuid":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.UserUUID.Reset()
-				if err := s.UserUUID.Decode(d); err != nil {
+				v, err := json.DecodeUUID(d)
+				s.UserUUID = v
+				if err != nil {
 					return err
 				}
 				return nil
@@ -936,6 +935,7 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"user_uuid\"")
 			}
 		case "part_uuids":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				s.PartUuids = make([]uuid.UUID, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -974,15 +974,15 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"transaction_uuid\"")
 			}
-		case "patment_method":
+		case "payment_method":
 			if err := func() error {
-				s.PatmentMethod.Reset()
-				if err := s.PatmentMethod.Decode(d); err != nil {
+				s.PaymentMethod.Reset()
+				if err := s.PaymentMethod.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"patment_method\"")
+				return errors.Wrap(err, "decode field \"payment_method\"")
 			}
 		case "status":
 			if err := func() error {
@@ -1000,6 +1000,38 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode OrderDto")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfOrderDto) {
+					name = jsonFieldsNameOfOrderDto[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
