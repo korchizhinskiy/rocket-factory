@@ -1,20 +1,18 @@
 package v1
 
 import (
-	service "github.com/korchizhinskiy/rocket-factory/payment/internal/service"
+	service "github.com/korchizhinskiy/rocket-factory/inventory/internal/service"
 	inventoryv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/inventory/v1"
-	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 type api struct {
 	inventoryv1.UnimplementedInventoryServiceServer
 
-	// paymentService service.PaymentService
+	inventoryService service.InventoryService
 }
 
-func NewAPI(inventoryService service.PaymentService) *api {
+func NewAPI(inventoryService service.InventoryService) *api {
 	return &api{
-		paymentService: paymentService,
+		inventoryService: inventoryService,
 	}
 }
-
