@@ -5,11 +5,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/korchizhinskiy/rocket-factory/payment/internal/model"
 	repoModel "github.com/korchizhinskiy/rocket-factory/payment/internal/repository/model"
+	"github.com/korchizhinskiy/rocket-factory/payment/internal/service/dto"
 )
 
-func (r *repository) Pay(ctx context.Context, payment model.Payment) (uuid.UUID, error) {
+func (r *repository) Pay(ctx context.Context, payment dto.PaymentDTOIn) (uuid.UUID, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

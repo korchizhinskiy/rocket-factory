@@ -6,6 +6,8 @@ import (
 )
 
 type api struct {
+	paymentv1.UnimplementedPaymentServiceServer
+
 	paymentService service.PaymentService
 }
 

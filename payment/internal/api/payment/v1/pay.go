@@ -3,12 +3,12 @@ package v1
 import (
 	"context"
 
-	"github.com/korchizhinskiy/rocket-factory/payment/internal/api/converter/payment"
+	"github.com/korchizhinskiy/rocket-factory/payment/internal/api/converter"
 	paymentv1 "github.com/korchizhinskiy/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 func (api *api) PayOrder(ctx context.Context, req *paymentv1.PayOrderRequest) (*paymentv1.PayOrderResponse, error) {
-	transactionID, err := api.paymentService.Pay(ctx, payment.ConvertPayRequestToModel(req))
+	transactionID, err := api.paymentService.Pay(ctx, converter.ConvertPayRequestToDTO(req))
 	if err != nil {
 		return nil, err
 	}

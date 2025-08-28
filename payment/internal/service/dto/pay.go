@@ -1,4 +1,4 @@
-package model
+package dto
 
 import (
 	"github.com/google/uuid"
@@ -6,9 +6,9 @@ import (
 	"github.com/korchizhinskiy/rocket-factory/payment/internal/model/enum"
 )
 
-type Payment struct {
+type PaymentDTOIn struct {
 	OrderID       uuid.UUID
 	UserID        uuid.UUID
-	PaymentMethod *enum.PaymentMethod
-	TransactionID *uuid.UUID
+	PaymentMethod enum.PaymentMethod
 }
+
