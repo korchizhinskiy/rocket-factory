@@ -6,6 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Category int
+
+const (
+	CategoryUnknown Category = iota
+	CategoryEngine
+	CategoryFuel
+	CategoryPorthole
+	CategoryWing
+)
+
 type Dimension struct {
 	Length float64
 	Width  float64
@@ -31,7 +41,7 @@ type Part struct {
 	Description   string
 	Price         float64
 	StockQuantity int64
-	Category      string
+	Category      Category
 	Dimensions    Dimension
 	Manufacturer  Manufacturer
 	Tags          *[]string

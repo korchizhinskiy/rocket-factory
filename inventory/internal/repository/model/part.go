@@ -21,13 +21,23 @@ type MetadataValue struct {
 	BoolValue   *bool
 }
 
+type Category int
+
+const (
+	CategoryUnknown Category = iota
+	CategoryEngine
+	CategoryFuel
+	CategoryPorthole
+	CategoryWing
+)
+
 type Part struct {
 	ID            string
 	Name          string
 	Description   string
 	Price         float64
 	StockQuantity int64
-	Category      string
+	Category      Category
 	Dimensions    Dimension
 	Manufacturer  Manufacturer
 	Tags          *[]string
